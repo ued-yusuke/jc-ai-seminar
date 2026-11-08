@@ -250,6 +250,16 @@ img[src*="assets/isometric/"]{object-fit:contain!important;background:#fff}
 .company-facts th{text-align:left;width:120px;color:var(--sub)}
 .company-photos{display:flex;gap:14px;margin-top:18px;width:100%}
 .company-photos img{flex:1;min-width:0;width:0;height:140px;object-fit:cover;border-radius:12px}
+  .member{display:grid;grid-template-columns:1fr 420px;gap:40px;align-items:center;width:100%}
+  .member .mtext{display:flex;flex-direction:column;gap:12px}
+  .member .mco{font-size:16px;font-weight:800;color:var(--g2);letter-spacing:.02em}
+  .member .mtt{font-size:28px;font-weight:900}
+  .member .stat{align-self:flex-start;padding:18px 26px}
+  .member .stat .n{font-size:56px}
+  .member .mdesc{font-size:17px;font-weight:600;color:var(--sub);line-height:1.6}
+  .member .mdesc b{color:var(--ink)}
+  .member .mimg{height:420px;border-radius:20px;background:#fff;box-shadow:0 0 0 1px var(--line);overflow:hidden;display:flex;align-items:center;justify-content:center}
+  .member .mimg img{width:100%;height:100%;object-fit:contain}
 </style>
 </head>
 <body>
@@ -675,6 +685,22 @@ img[src*="assets/isometric/"]{object-fit:contain!important;background:#fff}
     </div>
     <div class="note" data-anim style="--d:480;margin-top:14px">業務の仕組みと組み合わせた活用例です。読み取り・積算は人が確認。3D模型には推定を含みます。</div>
     <div class="foot"><span class="en">USE CASES</span><span><span class="num"></span></span></div>
+  </section>
+
+  <section class="slide top">
+    <div class="eyebrow" data-anim style="--d:60"><span class="en">JC MEMBERS</span>　／　JCメンバーの活用事例</div>
+    <h2 class="h-m" data-anim style="--d:160;margin-top:8px">会員企業で、<span class="grad">もう使われています。</span></h2>
+    <div class="member gap-s" data-anim style="--d:300">
+      <div class="mtext">
+        <div class="mco">グリーンスクエア社会保険労務士事務所 様</div>
+        <div class="mtt">申請業務を、AIで自動化</div>
+        <div class="stat"><div class="n">5<span class="u">時間以上／月 削減</span></div><div class="c">月100件超の申請 × 1件あたり約3分短縮（概算）</div></div>
+        <div class="mdesc">お客様ポータルの申請をAIが整理し、<b>タスク化・期限設定・チャット通知まで自動化</b>。申請漏れも防ぎます。</div>
+        <div class="pills"><span class="pill small">コミュニケーションコスト減</span><span class="pill small">業務の平準化</span><span class="pill small">申請漏れ防止</span><span class="pill small">対応スピード向上</span></div>
+      </div>
+      <div class="mimg"><img src="assets/img/greensquare-system.jpg" alt="グリーンスクエア様がAIで実装した仕組みの図"></div>
+    </div>
+    <div class="foot"><span class="en">JC MEMBERS</span><span><span class="num"></span></span></div>
   </section>
 
   <!-- 30 SAFETY -->
