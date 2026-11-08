@@ -1,0 +1,30 @@
+{
+  "tool": "built-in image_gen",
+  "concepts": [
+    {
+      "id": "01-precise-miniature",
+      "title": "精密ミニチュア",
+      "prompt": "Use case: style-transfer. Create one polished 3D illustration concept for a Japanese introductory generative AI seminar slide. Image 1 is the subject reference: preserve the idea of a friendly adult person conversing with a helpful small robot emerging from a large upright smartphone, with speech bubbles and an idea light bulb. Image 2 is only a style reference from a miniature brochure; do not copy its house, desk, workers or documents. White seamless background, soft contact shadows, centered isolated full composition with generous margins, no text, no logos, no watermark. Palette white, blue #4285F4, lavender #9B72CB, muted pink #EA6A8B, small mint accents. Square image. Premium realistic 1:12 scale resin miniature diorama photographed in a studio, like image 2. Adult Japanese business casual person with realistic proportions, carefully sculpted hair and subtle fabric texture. Precisely manufactured friendly robot and smartphone prop. Elevated three-quarter camera. Sophisticated corporate brochure quality."
+    },
+    {
+      "id": "02-clay",
+      "title": "クレイ",
+      "prompt": "Use case: style-transfer. Create one polished 3D illustration concept for a Japanese introductory generative AI seminar slide. Image 1 is the subject reference: preserve the idea of a friendly adult person conversing with a helpful small robot emerging from a large upright smartphone, with speech bubbles and an idea light bulb. Image 2 is only a style reference from a miniature brochure; do not copy its house, desk, workers or documents. White seamless background, soft contact shadows, centered isolated full composition with generous margins, no text, no logos, no watermark. Palette white, blue #4285F4, lavender #9B72CB, muted pink #EA6A8B, small mint accents. Square image. Soft sculpted clay miniature. Rounded tactile matte clay forms, simplified friendly adult human and robot, tiny handmade surface texture, substantial 3D depth and warm diffuse lighting. Refined and welcoming, not a flat cartoon."
+    },
+    {
+      "id": "03-isometric",
+      "title": "アイソメトリック",
+      "prompt": "Use case: style-transfer. Create one polished 3D illustration concept for a Japanese introductory generative AI seminar slide. Image 1 is the subject reference: preserve the idea of a friendly adult person conversing with a helpful small robot emerging from a large upright smartphone, with speech bubbles and an idea light bulb. Image 2 is only a style reference from a miniature brochure; do not copy its house, desk, workers or documents. White seamless background, soft contact shadows, centered isolated full composition with generous margins, no text, no logos, no watermark. Palette white, blue #4285F4, lavender #9B72CB, muted pink #EA6A8B, small mint accents. Square image. Architectural isometric miniature on a thin square white plinth. Orthographic three-quarter camera, crisp precise geometry, restrained adult character, smartphone and robot in a compact coherent small diorama. Matte plastic surfaces and clean ambient occlusion, highly legible at slide scale."
+    },
+    {
+      "id": "04-wood",
+      "title": "木製模型",
+      "prompt": "Use case: style-transfer. Create one polished 3D illustration concept for a Japanese introductory generative AI seminar slide. Image 1 is the subject reference: preserve the idea of a friendly adult person conversing with a helpful small robot emerging from a large upright smartphone, with speech bubbles and an idea light bulb. Image 2 is only a style reference from a miniature brochure; do not copy its house, desk, workers or documents. White seamless background, soft contact shadows, centered isolated full composition with generous margins, no text, no logos, no watermark. Palette white, blue #4285F4, lavender #9B72CB, muted pink #EA6A8B, small mint accents. Square image. Handcrafted premium wooden miniature model. Natural pale birch grain, layered carved wooden human and robot, painted blue lavender and coral details, a wooden smartphone with mint inset screen. Tangible miniature photography, gentle warm studio shadows, refined adult-friendly craft aesthetic."
+    },
+    {
+      "id": "05-acrylic",
+      "title": "透明アクリル",
+      "prompt": "Use case: style-transfer. Create one polished 3D illustration concept for a Japanese introductory generative AI seminar slide. Image 1 is the subject reference: preserve the idea of a friendly adult person conversing with a helpful small robot emerging from a large upright smartphone, with speech bubbles and an idea light bulb. Image 2 is only a style reference from a miniature brochure; do not copy its house, desk, workers or documents. White seamless background, soft contact shadows, centered isolated full composition with generous margins, no text, no logos, no watermark. Palette white, blue #4285F4, lavender #9B72CB, muted pink #EA6A8B, small mint accents. Square image. Premium contemporary 3D resin and frosted acrylic miniature. Opaque white adult human figurine with blue clothing and friendly opaque white lavender robot, translucent frosted blue smartphone and pink translucent speech bubbles. Subtle refraction, soft studio lighting, restrained premium materials, clearly readable silhouettes, no neon, no dark background."
+    }
+  ]
+}
