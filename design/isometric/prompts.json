@@ -1,0 +1,81 @@
+{
+  "tool": "built-in image_gen",
+  "style_reference": "design/isometric/concepts/03-isometric.png",
+  "assistant": "Reused approved 03-isometric concept.",
+  "jobs": [
+    {
+      "n": 8,
+      "id": "robot",
+      "prompt": "Use case: style-transfer. Asset: illustration for a Japanese beginner AI seminar slide. Image 1 is the subject reference; keep its explanatory meaning but fully rebuild in 3D. Image 2 is the approved STYLE reference. Match its sophisticated isometric miniature diorama style, orthographic elevated three-quarter view, matte smooth resin, softly rounded geometry, soft contact shadows, thin square white plinth, blue #4285F4 lavender #9B72CB muted pink #EA6A8B and tiny mint accents. White seamless background. Square composition, entire scene visible with 8% margins. No titles, no labels, no logos, no watermark, no photorealistic rooms. Do not copy the robot/phone/person from the style reference unless the requested subject calls for it. Few large objects so the illustration remains clear in small slide cards. Subject: A friendly small robot holding a glowing star; full body on a thin white square plinth."
+    },
+    {
+      "n": 9,
+      "id": "drafting",
+      "prompt": "Use case: style-transfer. Asset: illustration for a Japanese beginner AI seminar slide. Image 1 is the subject reference; keep its explanatory meaning but fully rebuild in 3D. Image 2 is the approved STYLE reference. Match its sophisticated isometric miniature diorama style, orthographic elevated three-quarter view, matte smooth resin, softly rounded geometry, soft contact shadows, thin square white plinth, blue #4285F4 lavender #9B72CB muted pink #EA6A8B and tiny mint accents. White seamless background. Square composition, entire scene visible with 8% margins. No titles, no labels, no logos, no watermark, no photorealistic rooms. Do not copy the robot/phone/person from the style reference unless the requested subject calls for it. Few large objects so the illustration remains clear in small slide cards. Subject: An adult office worker typing a draft on a laptop at a small desk. One clean document sheet. Readable even as a tiny thumbnail."
+    },
+    {
+      "n": 10,
+      "id": "summary",
+      "prompt": "Use case: style-transfer. Asset: illustration for a Japanese beginner AI seminar slide. Image 1 is the subject reference; keep its explanatory meaning but fully rebuild in 3D. Image 2 is the approved STYLE reference. Match its sophisticated isometric miniature diorama style, orthographic elevated three-quarter view, matte smooth resin, softly rounded geometry, soft contact shadows, thin square white plinth, blue #4285F4 lavender #9B72CB muted pink #EA6A8B and tiny mint accents. White seamless background. Square composition, entire scene visible with 8% margins. No titles, no labels, no logos, no watermark, no photorealistic rooms. Do not copy the robot/phone/person from the style reference unless the requested subject calls for it. Few large objects so the illustration remains clear in small slide cards. Subject: Disorganized sheets becoming three neatly organized document cards, on a tiny desktop with one simple curved arrow. No human necessary."
+    },
+    {
+      "n": 11,
+      "id": "ideas",
+      "prompt": "Use case: style-transfer. Asset: illustration for a Japanese beginner AI seminar slide. Image 1 is the subject reference; keep its explanatory meaning but fully rebuild in 3D. Image 2 is the approved STYLE reference. Match its sophisticated isometric miniature diorama style, orthographic elevated three-quarter view, matte smooth resin, softly rounded geometry, soft contact shadows, thin square white plinth, blue #4285F4 lavender #9B72CB muted pink #EA6A8B and tiny mint accents. White seamless background. Square composition, entire scene visible with 8% margins. No titles, no labels, no logos, no watermark, no photorealistic rooms. Do not copy the robot/phone/person from the style reference unless the requested subject calls for it. Few large objects so the illustration remains clear in small slide cards. Subject: An adult woman placing colorful blank sticky notes on a small brainstorming whiteboard, with one small idea light bulb."
+    },
+    {
+      "n": 12,
+      "id": "image-making",
+      "prompt": "Use case: style-transfer. Asset: illustration for a Japanese beginner AI seminar slide. Image 1 is the subject reference; keep its explanatory meaning but fully rebuild in 3D. Image 2 is the approved STYLE reference. Match its sophisticated isometric miniature diorama style, orthographic elevated three-quarter view, matte smooth resin, softly rounded geometry, soft contact shadows, thin square white plinth, blue #4285F4 lavender #9B72CB muted pink #EA6A8B and tiny mint accents. White seamless background. Square composition, entire scene visible with 8% margins. No titles, no labels, no logos, no watermark, no photorealistic rooms. Do not copy the robot/phone/person from the style reference unless the requested subject calls for it. Few large objects so the illustration remains clear in small slide cards. Subject: An adult designer using a stylus on a large tilted tablet showing simple colorful geometric artwork."
+    },
+    {
+      "n": 13,
+      "id": "research",
+      "prompt": "Use case: style-transfer. Asset: illustration for a Japanese beginner AI seminar slide. Image 1 is the subject reference; keep its explanatory meaning but fully rebuild in 3D. Image 2 is the approved STYLE reference. Match its sophisticated isometric miniature diorama style, orthographic elevated three-quarter view, matte smooth resin, softly rounded geometry, soft contact shadows, thin square white plinth, blue #4285F4 lavender #9B72CB muted pink #EA6A8B and tiny mint accents. White seamless background. Square composition, entire scene visible with 8% margins. No titles, no labels, no logos, no watermark, no photorealistic rooms. Do not copy the robot/phone/person from the style reference unless the requested subject calls for it. Few large objects so the illustration remains clear in small slide cards. Subject: An adult researcher at a laptop with simple bar charts, an open notebook and a magnifying glass."
+    },
+    {
+      "n": 15,
+      "id": "automation",
+      "prompt": "Use case: style-transfer. Asset: illustration for a Japanese beginner AI seminar slide. Image 1 is the subject reference; keep its explanatory meaning but fully rebuild in 3D. Image 2 is the approved STYLE reference. Match its sophisticated isometric miniature diorama style, orthographic elevated three-quarter view, matte smooth resin, softly rounded geometry, soft contact shadows, thin square white plinth, blue #4285F4 lavender #9B72CB muted pink #EA6A8B and tiny mint accents. White seamless background. Square composition, entire scene visible with 8% margins. No titles, no labels, no logos, no watermark, no photorealistic rooms. Do not copy the robot/phone/person from the style reference unless the requested subject calls for it. Few large objects so the illustration remains clear in small slide cards. Subject: A clear miniature workflow on one white plinth: left a portal computer screen with an application form, center a friendly robot sorting checklist tasks beside a calendar and clock, right a chat notification bell beside two small adult colleagues. Connect left to center to right with two blue arrows. No text. Keep the three-step workflow readable."
+    },
+    {
+      "n": 16,
+      "id": "reports",
+      "prompt": "Use case: style-transfer. Asset: illustration for a Japanese beginner AI seminar slide. Image 1 is the subject reference; keep its explanatory meaning but fully rebuild in 3D. Image 2 is the approved STYLE reference. Match its sophisticated isometric miniature diorama style, orthographic elevated three-quarter view, matte smooth resin, softly rounded geometry, soft contact shadows, thin square white plinth, blue #4285F4 lavender #9B72CB muted pink #EA6A8B and tiny mint accents. White seamless background. Square composition, entire scene visible with 8% margins. No titles, no labels, no logos, no watermark, no photorealistic rooms. Do not copy the robot/phone/person from the style reference unless the requested subject calls for it. Few large objects so the illustration remains clear in small slide cards. Subject: A stack of messy meeting notes on the left, a curved blue arrow, a neat upright report with three colored sections and a checkmark on the right. On one thin square plinth."
+    },
+    {
+      "n": 17,
+      "id": "social",
+      "prompt": "Use case: style-transfer. Asset: illustration for a Japanese beginner AI seminar slide. Image 1 is the subject reference; keep its explanatory meaning but fully rebuild in 3D. Image 2 is the approved STYLE reference. Match its sophisticated isometric miniature diorama style, orthographic elevated three-quarter view, matte smooth resin, softly rounded geometry, soft contact shadows, thin square white plinth, blue #4285F4 lavender #9B72CB muted pink #EA6A8B and tiny mint accents. White seamless background. Square composition, entire scene visible with 8% margins. No titles, no labels, no logos, no watermark, no photorealistic rooms. Do not copy the robot/phone/person from the style reference unless the requested subject calls for it. Few large objects so the illustration remains clear in small slide cards. Subject: A large upright smartphone with three social post cards, small heart reactions, a megaphone and a checked calendar. On one thin square plinth."
+    },
+    {
+      "n": 20,
+      "id": "deep-research",
+      "prompt": "Use case: style-transfer. Asset: illustration for a Japanese beginner AI seminar slide. Image 1 is the subject reference; keep its explanatory meaning but fully rebuild in 3D. Image 2 is the approved STYLE reference. Match its sophisticated isometric miniature diorama style, orthographic elevated three-quarter view, matte smooth resin, softly rounded geometry, soft contact shadows, thin square white plinth, blue #4285F4 lavender #9B72CB muted pink #EA6A8B and tiny mint accents. White seamless background. Square composition, entire scene visible with 8% margins. No titles, no labels, no logos, no watermark, no photorealistic rooms. Do not copy the robot/phone/person from the style reference unless the requested subject calls for it. Few large objects so the illustration remains clear in small slide cards. Subject: A magnifying glass inspecting stacked research reports with miniature bar charts, on one thin square white plinth. Large clear objects and restrained details."
+    },
+    {
+      "n": 21,
+      "id": "presentation",
+      "prompt": "Use case: style-transfer. Asset: illustration for a Japanese beginner AI seminar slide. Image 1 is the subject reference; keep its explanatory meaning but fully rebuild in 3D. Image 2 is the approved STYLE reference. Match its sophisticated isometric miniature diorama style, orthographic elevated three-quarter view, matte smooth resin, softly rounded geometry, soft contact shadows, thin square white plinth, blue #4285F4 lavender #9B72CB muted pink #EA6A8B and tiny mint accents. White seamless background. Square composition, entire scene visible with 8% margins. No titles, no labels, no logos, no watermark, no photorealistic rooms. Do not copy the robot/phone/person from the style reference unless the requested subject calls for it. Few large objects so the illustration remains clear in small slide cards. Subject: A stack of slide cards with pie charts, line charts and a tiny presentation board on a thin square plinth. Clear readable silhouette."
+    },
+    {
+      "n": 22,
+      "id": "conversation",
+      "prompt": "Use case: style-transfer. Asset: illustration for a Japanese beginner AI seminar slide. Image 1 is the subject reference; keep its explanatory meaning but fully rebuild in 3D. Image 2 is the approved STYLE reference. Match its sophisticated isometric miniature diorama style, orthographic elevated three-quarter view, matte smooth resin, softly rounded geometry, soft contact shadows, thin square white plinth, blue #4285F4 lavender #9B72CB muted pink #EA6A8B and tiny mint accents. White seamless background. Square composition, entire scene visible with 8% margins. No titles, no labels, no logos, no watermark, no photorealistic rooms. Do not copy the robot/phone/person from the style reference unless the requested subject calls for it. Few large objects so the illustration remains clear in small slide cards. Subject: Two friendly adult people facing each other in a conversation with two speech bubbles, on a thin square white plinth. One person holds a small tablet."
+    },
+    {
+      "n": 23,
+      "id": "fact-check",
+      "prompt": "Use case: style-transfer. Asset: illustration for a Japanese beginner AI seminar slide. Image 1 is the subject reference; keep its explanatory meaning but fully rebuild in 3D. Image 2 is the approved STYLE reference. Match its sophisticated isometric miniature diorama style, orthographic elevated three-quarter view, matte smooth resin, softly rounded geometry, soft contact shadows, thin square white plinth, blue #4285F4 lavender #9B72CB muted pink #EA6A8B and tiny mint accents. White seamless background. Square composition, entire scene visible with 8% margins. No titles, no labels, no logos, no watermark, no photorealistic rooms. Do not copy the robot/phone/person from the style reference unless the requested subject calls for it. Few large objects so the illustration remains clear in small slide cards. Subject: A large magnifying glass over a document with a green checkmark, and a small question-mark tile, on a thin square white plinth."
+    },
+    {
+      "n": 24,
+      "id": "privacy",
+      "prompt": "Use case: style-transfer. Asset: illustration for a Japanese beginner AI seminar slide. Image 1 is the subject reference; keep its explanatory meaning but fully rebuild in 3D. Image 2 is the approved STYLE reference. Match its sophisticated isometric miniature diorama style, orthographic elevated three-quarter view, matte smooth resin, softly rounded geometry, soft contact shadows, thin square white plinth, blue #4285F4 lavender #9B72CB muted pink #EA6A8B and tiny mint accents. White seamless background. Square composition, entire scene visible with 8% margins. No titles, no labels, no logos, no watermark, no photorealistic rooms. Do not copy the robot/phone/person from the style reference unless the requested subject calls for it. Few large objects so the illustration remains clear in small slide cards. Subject: A large blue padlock with a shield in front of a small group of colorful confidential document folders, on a thin square white plinth."
+    }
+  ],
+  "reused": {
+    "14": "conversation",
+    "22": "conversation"
+  }
+}
