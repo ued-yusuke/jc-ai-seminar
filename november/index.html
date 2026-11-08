@@ -1,0 +1,767 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>東海JC 11月例会｜AI活用セミナー</title>
+<!--
+  index.html（東海YEG 2026-10-22・全31枚）の内容を、jc-ai-seminar（JC AI活用講座）の
+  デザインに載せ替えた版。東海YEGの内容を継承し、イラストは共有JCリポジトリのアイソメトリック素材に変更。
+  ← → / クリックで送り、F で全画面、Ctrl+P で全ページをPDF保存。
+-->
+<style>
+  :root{
+    --ink:#141416; --sub:#6b6b72; --line:#e7e7ea; --bg:#ececed; --card:#f5f5f7; --tint:#f1f1f6;
+    --g1:#4285F4; --g2:#9B72CB; --g3:#EA6A8B;
+    --grad:linear-gradient(120deg,var(--g1) 0%,var(--g2) 52%,var(--g3) 100%);
+    --sans:"Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic",YuGothic,"Noto Sans JP",sans-serif;
+    --en:"Helvetica Neue",Arial,sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%;background:var(--bg);font-family:var(--sans);color:var(--ink);-webkit-font-smoothing:antialiased;overflow:hidden}
+  #stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+  #deck{width:1280px;height:720px;position:relative;transform-origin:center center;flex:0 0 auto}
+  .slide{position:absolute;inset:0;background:#fff;border-radius:14px;overflow:hidden;
+    opacity:0;visibility:hidden;pointer-events:none;
+    box-shadow:0 30px 80px rgba(20,20,30,.14),0 4px 14px rgba(20,20,30,.06);
+    padding:64px 80px;display:flex;flex-direction:column;justify-content:center;align-items:flex-start}
+  .slide.top{justify-content:flex-start;padding-top:56px}
+  .slide.dense{justify-content:flex-start;padding:48px 72px 0}
+  .slide.is-active{opacity:1;visibility:visible;pointer-events:auto}
+  .slide [data-anim]{opacity:0;transform:translateY(24px);transition:opacity .7s cubic-bezier(.2,.75,.2,1),transform .7s cubic-bezier(.2,.75,.2,1);transition-delay:calc(var(--d,0)*1ms)}
+  .slide.is-active [data-anim]{opacity:1;transform:none}
+  .slide [data-anim="scale"]{transform:scale(.93)}
+  .slide.is-active [data-anim="scale"]{transform:none}
+
+  .group{width:100%;display:flex;flex-direction:column}
+  .eyebrow{font-size:18px;font-weight:800;letter-spacing:.08em;color:var(--sub)}
+  .eyebrow .en{font-family:var(--en);letter-spacing:.2em}
+  .kicker{display:inline-flex;align-self:flex-start;align-items:center;gap:8px;font-size:14px;font-weight:800;letter-spacing:.04em;color:#fff;background:var(--ink);padding:8px 16px;border-radius:100px;margin-bottom:20px}
+  .kicker.work{background:var(--grad)}
+  h1{font-size:84px;line-height:1.12;font-weight:900;letter-spacing:-.01em}
+  h2{font-size:52px;line-height:1.18;font-weight:900;letter-spacing:-.01em}
+  .h-m{font-size:44px}.h-s{font-size:38px}
+  .lead{font-size:24px;line-height:1.6;color:var(--sub);font-weight:600}
+  .grad{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  b.ink,.lead b{color:var(--ink)}
+  .gap-xs{margin-top:20px}.gap-s{margin-top:30px}.gap-m{margin-top:42px}
+  .foot{position:absolute;left:80px;right:80px;bottom:30px;display:flex;justify-content:space-between;align-items:center;font-size:14px;color:#b3b3ba;font-weight:700}
+  .foot .en{font-family:var(--en);letter-spacing:.1em}
+  .num{font-family:var(--en);font-weight:800}
+  .note{font-size:15px;font-weight:600;color:var(--sub);line-height:1.5}
+
+  .ic{width:58px;height:58px;border-radius:15px;background:var(--tint);display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+  .ic.g{background:linear-gradient(120deg,rgba(66,133,244,.14),rgba(234,106,139,.14))}
+  .ic svg{width:29px;height:29px;stroke:var(--ink);stroke-width:1.9;fill:none;stroke-linecap:round;stroke-linejoin:round}
+  .ic.sm{width:48px;height:48px;border-radius:13px}.ic.sm svg{width:24px;height:24px}
+
+  .pills{display:flex;gap:12px;flex-wrap:wrap}
+  .pill{font-size:20px;font-weight:800;padding:12px 24px;border-radius:100px;background:var(--card);color:var(--ink)}
+  .pill.on{background:var(--ink);color:#fff}
+  .pill.small{font-size:15px;padding:8px 15px}
+
+  .orb{position:absolute;border-radius:50%;filter:blur(46px);opacity:.5;background:var(--grad)}
+  .drift{animation:drift 14s ease-in-out infinite alternate}
+  @keyframes drift{from{transform:translate(0,0) scale(1)}to{transform:translate(40px,-30px) scale(1.14)}}
+
+  .frame{border-radius:20px;overflow:hidden;background:var(--card);box-shadow:0 20px 50px rgba(20,20,40,.16);position:relative}
+  .frame img{width:100%;height:100%;object-fit:cover;display:block}
+  .frame.contain img{object-fit:contain}
+  .frame.white{background:#fff}
+  .tag{position:absolute;font-size:13px;font-weight:800;color:#fff;background:rgba(20,20,25,.62);padding:6px 13px;border-radius:100px;bottom:13px;left:13px}
+  .tag.top{top:13px;bottom:auto}
+  .tag.g{background:var(--grad)}
+  .til{display:flex;align-items:center;justify-content:center;background:#fff;border-radius:16px;box-shadow:inset 0 0 0 1px var(--line);overflow:hidden}
+  .til img{width:100%;height:100%;object-fit:contain;display:block}
+
+  /* cover / section */
+  .cover-row{display:flex;gap:56px;align-items:center;width:100%;position:relative;z-index:2}
+  .brand{display:flex;align-items:center;gap:12px}
+  .brand img{height:22px;display:block}
+  .secno{position:absolute;right:70px;bottom:-40px;font-family:var(--en);font-size:300px;font-weight:900;line-height:1;opacity:.13;letter-spacing:-.04em}
+
+  /* lecturer / company */
+  .prof-name{font-size:56px;font-weight:900;line-height:1.1}
+  .prof-name .en{font-family:var(--en);font-size:18px;letter-spacing:.2em;color:var(--sub);margin-left:18px;font-weight:800}
+  .pe{display:flex;flex-direction:column;gap:12px;width:100%}
+  .perow{display:flex;align-items:center;gap:20px;background:var(--card);border-radius:18px;padding:18px 24px}
+  .perow .lab{font-size:24px;font-weight:900;display:flex;align-items:baseline;gap:8px;flex:0 0 auto}
+  .perow .lab .no{font-family:var(--en);font-size:16px;color:var(--g2)}
+  .perow .ex{font-size:19px;font-weight:600;color:var(--sub);line-height:1.5}
+  .perow .ex b{color:var(--ink)}
+  .facts{display:flex;flex-direction:column;gap:8px;flex:1}
+  .fact{display:flex;gap:18px;align-items:baseline;background:var(--card);border-radius:14px;padding:12px 20px}
+  .fact .k{font-size:15px;font-weight:800;color:var(--sub);width:58px;flex:0 0 auto}
+  .fact .v{font-size:18px;font-weight:800}
+  .stat{background:#141416;color:#fff;border-radius:22px;padding:24px 28px;display:flex;flex-direction:column;gap:6px}
+  .stat .n{font-family:var(--en);font-size:66px;font-weight:900;line-height:1}
+  .stat .n .u{font-family:var(--sans);font-size:22px;margin-left:4px}
+  .stat .c{font-size:15px;font-weight:700;color:#c9c9d2}
+  .photos{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;width:100%}
+  .photos .frame{height:132px;box-shadow:0 10px 26px rgba(20,20,40,.12);border-radius:16px}
+
+  /* agenda */
+  .agenda{display:flex;gap:20px;align-items:stretch;width:100%}
+  .acard{flex:1;background:var(--card);border-radius:22px;padding:22px 24px 24px;display:flex;flex-direction:column;gap:10px}
+  .acard.mid{background:#141416;color:#fff}
+  .acard .ph{font-size:15px;font-weight:800;letter-spacing:.06em;color:var(--sub)}
+  .acard .ph .n{font-family:var(--en);color:var(--g2);margin-right:8px}
+  .acard.mid .ph{color:#c9c9d2}.acard.mid .ph .n{color:#c9a8ff}
+  .acard .at{font-size:27px;font-weight:900;line-height:1.28}
+  .acard .ad{font-size:15px;font-weight:600;color:var(--sub);line-height:1.55}
+  .acard.mid .ad{color:#c9c9d2}
+  .acard .til{height:140px}
+  .goal{display:flex;align-items:center;gap:18px;width:100%;background:#eef1ff;box-shadow:0 0 0 2px var(--g1) inset;border-radius:18px;padding:16px 24px}
+  .goal .gl{font-size:14px;font-weight:800;color:#fff;background:var(--grad);padding:7px 15px;border-radius:100px;flex:0 0 auto}
+  .goal .gt{font-size:22px;font-weight:900}
+
+  /* town bubbles */
+  .town{position:relative;width:1066px;height:600px;align-self:center;flex-shrink:0}
+  .slide.town-slide{padding:24px 40px 0}
+  .town-slide h2{margin-top:0!important;font-size:36px}
+  .town-slide .town{margin-top:14px!important}
+  .town-slide .foot{display:none}
+  .town-slide .town img{object-fit:contain}
+  .town-slide .bub{font-size:17px}
+  .bub{position:absolute;transform:translate(-50%,-100%);padding:8px 13px;border-radius:13px;background:#fff;color:var(--ink);font-size:15px;font-weight:800;white-space:nowrap;box-shadow:0 8px 20px rgba(20,20,40,.18)}
+  .bub::after{content:"";position:absolute;left:50%;bottom:-8px;transform:translateX(-50%);border-top:9px solid #fff;border-left:7px solid transparent;border-right:7px solid transparent}
+  .bub::before{content:"";position:absolute;left:12px;top:50%;width:6px;height:6px;margin-top:-3px;border-radius:50%;background:var(--grad)}
+  .bub{padding-left:24px}
+
+  /* AI tools */
+  .aigrid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;width:100%}
+  .aicard{background:var(--card);border-radius:20px;padding:24px 14px 22px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;position:relative}
+  .aicard .logo{width:88px;height:88px;border-radius:22px;display:flex;align-items:center;justify-content:center;background:#fff;box-shadow:0 4px 14px rgba(0,0,0,.08),inset 0 0 0 1px var(--line);overflow:hidden}
+  .aicard .logo img{width:60px;height:60px;object-fit:contain}
+  .aicard .nm{font-size:24px;font-weight:900;font-family:var(--en);letter-spacing:-.01em;margin-top:4px}
+  .aicard .co{font-size:14px;font-weight:800;color:var(--sub);font-family:var(--en);letter-spacing:.06em}
+  .aicard.on{background:#eef1ff;box-shadow:0 0 0 2px var(--g1) inset}
+  .aicard .today{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:var(--grad);color:#fff;font-size:13px;font-weight:800;padding:6px 14px;border-radius:100px;white-space:nowrap;box-shadow:0 8px 20px rgba(155,114,203,.4)}
+  .envcard{display:flex;gap:22px;align-items:center;width:100%;background:var(--card);border-radius:18px;padding:18px 24px}
+  .envcard .t{font-size:20px;font-weight:800;line-height:1.5}
+  .envcard .s{font-size:15px;font-weight:600;color:var(--sub);margin-top:2px}
+
+  /* capabilities */
+  .usegrid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;width:100%}
+  .ucard{background:var(--card);border-radius:18px;padding:20px 22px;display:flex;flex-direction:column;gap:9px;position:relative;transition:opacity .4s}
+  .ucard .til{width:84px;height:84px;border-radius:16px}
+  .ucard .ut{font-size:23px;font-weight:900}
+  .ucard .ud{font-size:15px;font-weight:600;color:var(--sub);line-height:1.5}
+  .usegrid.pick .ucard{opacity:.42}
+  .usegrid.pick .ucard.on{opacity:1;background:#eef1ff;box-shadow:0 0 0 2px var(--g1) inset}
+  .ucard .wk{position:absolute;top:16px;right:16px;font-size:12px;font-weight:800;color:#fff;background:var(--grad);padding:5px 11px;border-radius:100px}
+
+  /* image work */
+  .cmp2{display:flex;align-items:center;gap:22px;width:100%;justify-content:center}
+  .cmp2 .frame{width:500px;height:333px}
+  .arrowc{width:56px;height:56px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;color:#fff;font-size:26px;font-weight:900;flex:0 0 auto;box-shadow:0 10px 24px rgba(155,114,203,.4)}
+  .cap{font-size:17px;font-weight:800;margin-top:12px;text-align:center}
+  .cap.sub{color:var(--sub)}
+
+  .practice{display:flex;gap:44px;width:100%;align-items:flex-start}
+  .material{flex:0 0 430px;display:flex;flex-direction:column;gap:14px;align-items:flex-start}
+  .material .frame{width:430px;height:287px}
+  .dl{display:inline-flex;align-items:center;gap:9px;font-size:16px;font-weight:800;color:var(--ink);background:var(--card);padding:11px 20px;border-radius:100px;text-decoration:none}
+  .dl svg{width:18px;height:18px;stroke:var(--ink);stroke-width:2.2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+  .steps{display:flex;gap:10px;flex-wrap:wrap}
+  .steps li{list-style:none;display:flex;align-items:center;gap:10px;font-size:18px;font-weight:800;background:var(--card);padding:10px 18px 10px 10px;border-radius:100px}
+  .steps.col{flex-direction:column;align-items:flex-start}
+  .no-c{width:30px;height:30px;border-radius:50%;background:var(--ink);color:#fff;font-family:var(--en);font-size:15px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}
+  .no-c.g{background:var(--grad)}
+
+  .prompt{position:relative;width:100%;background:#fff;border:2px solid var(--line);border-radius:22px;padding:26px 28px 22px 64px;box-shadow:0 22px 54px rgba(20,20,40,.10)}
+  .prompt::before{content:"\201C";position:absolute;left:22px;top:6px;font-family:var(--en);font-size:62px;font-weight:900;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .prompt pre{font-family:var(--sans);font-size:24px;font-weight:800;line-height:1.6;white-space:pre-wrap;color:var(--ink)}
+  .prompt.lg pre{font-size:27px}
+  .prompt .rep{color:var(--g3);font-size:.75em;margin-left:2px}
+  .prompt .pfoot{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:16px}
+  .copy-btn{font-family:var(--sans);font-size:16px;font-weight:800;color:#fff;background:var(--grad);border:0;border-radius:100px;padding:11px 22px;cursor:pointer;box-shadow:0 8px 20px rgba(155,114,203,.35);margin-left:auto}
+  .adviser{width:150px;height:150px;object-fit:contain;mix-blend-mode:multiply}
+
+  /* screenshots with click marks */
+  .shot{position:relative;display:inline-block;border-radius:12px;background:#fff;box-shadow:0 0 0 1px var(--line),0 16px 40px rgba(20,20,40,.12);line-height:0;flex:0 0 auto;align-self:flex-start}
+  .shot img{display:block;border-radius:12px}
+  .mk{position:absolute;border:3.5px solid var(--g1);border-radius:9px;pointer-events:none;animation:pulse 1.5s ease-out infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(66,133,244,.5)}70%{box-shadow:0 0 0 12px rgba(66,133,244,0)}100%{box-shadow:0 0 0 0 rgba(66,133,244,0)}}
+  .oprow{display:flex;align-items:center;gap:36px;width:100%}
+  .oprow .ol{flex:1}
+  .oph{display:flex;align-items:center;gap:12px;font-size:22px;font-weight:900;line-height:1.35}
+  .oph .no-c{width:34px;height:34px;font-size:16px}
+  .opp{font-size:16px;font-weight:600;color:var(--sub);margin:6px 0 0 46px;line-height:1.5}
+  .opstack{display:flex;flex-direction:column;gap:14px;width:100%}
+
+  /* sales flow */
+  .flow{display:flex;gap:16px;width:100%;align-items:stretch}
+  .fcard{flex:1;background:var(--card);border-radius:22px;padding:22px 24px 24px;display:flex;flex-direction:column;gap:10px}
+  .fcard.mid{background:#141416;color:#fff}
+  .fcard .st{font-family:var(--en);font-size:14px;font-weight:800;letter-spacing:.12em;color:var(--g2)}
+  .fcard.mid .st{color:#c9a8ff}
+  .fcard .ft{font-size:27px;font-weight:900}
+  .fcard .til{height:158px}
+  .fcard .fs{font-size:18px;font-weight:900;margin-top:2px}
+  .fcard .fd{font-size:15px;font-weight:600;color:var(--sub);line-height:1.55}
+  .fcard.mid .fd{color:#c9c9d2}
+  .fcard .fd strong{color:var(--ink)}.fcard.mid .fd strong{color:#fff}
+  .farrow{align-self:center;color:var(--g2);font-size:26px;font-weight:900}
+
+  /* cases / safety */
+  .cases{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;width:100%}
+  .ccard{background:var(--card);border-radius:20px;overflow:hidden;display:flex;flex-direction:column}
+  .ccard img{width:100%;height:172px;object-fit:cover;display:block}
+  .ccard .cb{padding:18px 22px 22px;display:flex;flex-direction:column;gap:8px}
+  .ccard .cl{font-size:13px;font-weight:800;color:var(--g2);letter-spacing:.04em}
+  .ccard .ct{font-size:22px;font-weight:900;line-height:1.35}
+  .ccard .cd{font-size:15px;font-weight:600;color:var(--sub);line-height:1.5}
+  .ccard .demo{align-self:flex-start;font-size:14px;font-weight:800;color:#fff;background:var(--ink);padding:7px 15px;border-radius:100px;text-decoration:none;margin-top:4px}
+  .safe{display:grid;grid-template-columns:1fr 1fr;gap:14px;width:100%}
+  .scard{background:var(--card);border-radius:20px;padding:16px 22px;display:flex;gap:18px;align-items:center}
+  .sill{width:104px;height:104px;flex:0 0 auto;border-radius:16px;background-color:#fff;box-shadow:inset 0 0 0 1px var(--line);background-size:400% 200%;background-repeat:no-repeat}
+  .scard .sn{font-family:var(--en);font-size:14px;font-weight:800;color:var(--g2)}
+  .scard .stt{font-size:20px;font-weight:900;line-height:1.35;margin-top:2px}
+  .scard .sd{font-size:14px;font-weight:600;color:var(--sub);line-height:1.5;margin-top:5px}
+  .srcs{font-size:13px;font-weight:700;color:var(--sub)}
+  .srcs a,.reflink{color:var(--sub)}
+
+  #nav{position:fixed;left:0;right:0;bottom:16px;display:flex;justify-content:center;gap:8px;z-index:10}
+  .dot{width:8px;height:8px;border-radius:50%;background:#c7c7cd;cursor:pointer;transition:.3s}
+  .dot.on{background:var(--ink);width:24px;border-radius:100px}
+  .arrowbtn{position:fixed;top:50%;transform:translateY(-50%);width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,.9);box-shadow:0 6px 20px rgba(0,0,0,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10;font-size:22px;color:#555;border:0;user-select:none}
+  #prev{left:16px}#next{right:16px}
+  #bar{position:fixed;top:0;left:0;height:4px;background:var(--grad);z-index:20;transition:width .4s ease}
+  .hint{position:fixed;left:16px;bottom:14px;font-size:12px;color:#b0b0b6;z-index:10;font-weight:700}
+
+  /* Ctrl+P：全ページを1280×720で書き出す */
+  @page{size:1280px 720px;margin:0}
+  @media print{
+    html,body{height:auto;overflow:visible;background:#fff}
+    #stage{position:static;display:block}
+    #deck{transform:none!important;height:auto}
+    .slide{position:relative;inset:auto;width:1280px;height:720px;opacity:1;visibility:visible;border-radius:0;box-shadow:none;break-after:page;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .slide [data-anim]{opacity:1!important;transform:none!important;transition:none}
+    .mk,.drift{animation:none}
+    #nav,.arrowbtn,#bar,.hint,.copy-btn,.dl{display:none!important}
+  }
+
+img[src*="assets/isometric/"]{object-fit:contain!important;background:#fff}
+.sill{background-image:none;object-fit:contain}
+.profile-grid{display:grid;grid-template-columns:280px 1fr;gap:48px;align-items:center;width:100%;margin-top:28px}
+.profile-grid p{font-size:22px;line-height:1.8;margin-top:14px}
+.company-facts{font-size:20px;line-height:1.7;width:100%;margin-top:20px}
+.company-facts th{text-align:left;width:120px;color:var(--sub)}
+.company-photos{display:flex;gap:14px;margin-top:18px;width:100%}
+.company-photos img{flex:1;min-width:0;width:0;height:140px;object-fit:cover;border-radius:12px}
+</style>
+</head>
+<body>
+<div id="bar"></div>
+<div id="stage"><div id="deck">
+
+  <!-- 1 COVER -->
+  <section class="slide">
+    <div class="orb drift" style="width:520px;height:520px;right:-140px;top:-160px"></div>
+    <div class="orb drift" style="width:360px;height:360px;left:-120px;bottom:-140px;animation-delay:-6s;opacity:.4"></div>
+    <div class="cover-row">
+      <div style="flex:1">
+        <div class="eyebrow" data-anim style="--d:80"><span class="en">AI SEMINAR</span>　／　2026年11月</div>
+        <h1 data-anim style="--d:220;margin-top:22px;font-size:78px;white-space:nowrap">東海JC 11月例会<br><span class="grad">AIセミナー</span></h1>
+        <div class="lead" data-anim style="--d:420;margin-top:24px">実演で知る。仕事に活かす。<br>可能性を広げる。</div>
+      </div>
+    </div>
+    <div class="foot"><span class="en">GENERATIVE AI FOR BUSINESS</span></div>
+  </section>
+
+  <!-- 4 AGENDA -->
+  <section class="slide top">
+    <div class="eyebrow" data-anim style="--d:60"><span class="en">TODAY</span>　／　本日の流れ</div>
+    <h2 class="h-m" data-anim style="--d:160;margin-top:8px">実演で知る → 使い方がわかる → <span class="grad">可能性を広げる。</span></h2>
+    <div class="agenda gap-s" data-anim style="--d:320">
+      <div class="acard">
+        <div class="til"><img src="assets/isometric/assistant.png" alt="パソコンでAIを使う人"></div>
+        <div class="ph"><span class="n">01</span>使い方を見る</div><div class="at">画像づくりを実演</div><div class="ad">外構の提案画像や店頭POPを作る様子を、講師が実演します。</div>
+      </div>
+      <div class="acard mid">
+        <div class="til"><img src="assets/isometric/conversation.png" alt="資料を見ながら企画を考える人たち"></div>
+        <div class="ph"><span class="n">02</span>企画づくりの例</div><div class="at">売上UPの施策を作る</div><div class="ad">調査から施策の検討、スライド作成までの流れをお見せします。</div>
+      </div>
+      <div class="acard">
+        <div class="til"><img src="assets/isometric/ideas.png" alt="顔の上に活用アイデアが浮かぶ人"></div>
+        <div class="ph"><span class="n">03</span>活用例を紹介</div><div class="at">仕事での使い方を知る</div><div class="ad">仕事に役立つAIの活用例を紹介します。</div>
+      </div>
+    </div>
+    <div class="goal" data-anim style="--d:520;margin-top:18px"><span class="gl">今日のゴール</span><span class="gt">明日から試せるAI活用のアイディアを、1つ持ち帰る。</span></div>
+    <div class="foot"><span class="en">AGENDA</span><span><span class="num"></span></span></div>
+  </section>
+
+  <!-- 5 SECTION 01 -->
+  <section class="slide">
+    <div class="orb drift" style="width:480px;height:480px;right:-120px;top:-150px;opacity:.42"></div>
+    <div class="secno grad">01</div>
+    <div class="group" style="position:relative;z-index:2">
+      <div class="kicker" data-anim style="--d:40">SECTION 01</div>
+      <h1 data-anim style="--d:180">生成AIと<br><span class="grad">Gemini。</span></h1>
+    </div>
+    <div class="foot"><span class="en">GENERATIVE AI &amp; GEMINI</span><span class="num"></span></div>
+  </section>
+
+  <!-- 6 TOWN TALK -->
+  <section class="slide dense town-slide">
+    <h2 class="h-s" data-anim style="--d:160;margin-top:8px">身近な仕事に、こんな<span class="grad">使い方</span>があります。</h2>
+    <div class="town frame" data-anim="scale" style="--d:320;margin-top:22px;overflow:visible">
+      <img src="assets/img/ai-town-isometric-v3.png" alt="港、工場、倉庫、商店街、住宅、オフィスの街並みに、外構工事と工場の外壁塗装を加えた俯瞰イラスト" style="border-radius:20px">
+      <div class="bub" style="left:29%;top:24%">点検手順を教えて</div>
+      <div class="bub" style="left:12%;top:33%">塗装の完成イメージを作って</div>
+      <div class="bub" style="left:55%;top:13%">議事録をまとめて</div>
+      <div class="bub" style="left:82%;top:15%">外構の提案を3案</div>
+      <div class="bub" style="left:89%;top:39%">この植物の名前は？</div>
+      <div class="bub" style="left:76%;top:54%">商品のPOPを作って</div>
+      <div class="bub" style="left:55%;top:59%">引継ぎメモを整理して</div>
+      <div class="bub" style="left:30.5%;top:65%">このメールを英語に</div>
+    </div>
+
+  </section>
+
+  <!-- 7 AI TOOLS -->
+  <section class="slide top">
+    <div class="eyebrow" data-anim style="--d:60"><span class="en">AI TOOLS</span>　／　代表的なAIツール</div>
+    <h2 class="h-m" data-anim style="--d:160;margin-top:8px">本日は <span class="grad">Gemini</span> の使い方を実演します。</h2>
+    <div class="lead" data-anim style="--d:260;font-size:20px;margin-top:10px">始めやすさと、機能の種類の多さから選びました。</div>
+    <div class="aigrid gap-m" data-anim style="--d:360">
+      <div class="aicard"><div class="logo"><img src="assets/img/logo-chatgpt.png" alt=""></div><div class="nm">ChatGPT</div><div class="co">OpenAI</div></div>
+      <div class="aicard"><div class="logo"><img src="assets/img/logo-copilot.png" alt=""></div><div class="nm">Copilot</div><div class="co">Microsoft</div></div>
+      <div class="aicard on"><span class="today">実演するツール</span><div class="logo"><img src="assets/img/logo-gemini.png" alt=""></div><div class="nm">Gemini</div><div class="co">Google</div></div>
+      <div class="aicard"><div class="logo"><img src="assets/img/logo-claude.png" alt=""></div><div class="nm">Claude</div><div class="co">Anthropic</div></div>
+      <div class="aicard"><div class="logo"><img src="assets/img/logo-grok.png" alt=""></div><div class="nm">Grok</div><div class="co">xAI</div></div>
+    </div>
+    <div class="envcard" data-anim style="--d:520;margin-top:22px">
+      <span class="pill on small" style="flex:0 0 auto">本日の進め方</span>
+      <div><div class="t">講師の画面で、入力する指示と生成される結果をご覧いただきます。</div><div class="s">無料でも、今日ご紹介する一部の機能はご利用可能です。利用できる機能や回数は、プランやアカウントによって異なります。</div></div>
+    </div>
+    <div class="foot"><span class="en">AI TOOLS</span><span><span class="num"></span></span></div>
+  </section>
+
+  <!-- 8 CAPABILITIES -->
+  <section class="slide top">
+    <div class="eyebrow" data-anim style="--d:60"><span class="en">CAPABILITIES</span>　／　Geminiでできること</div>
+    <h2 class="h-m" data-anim style="--d:160;margin-top:8px">Geminiに任せられる、<span class="grad">8つの仕事。</span></h2>
+    <div class="usegrid gap-s" data-anim style="--d:320">
+      <div class="ucard"><div class="til"><img src="assets/isometric/drafting.png" alt=""></div><div class="ut">文章生成</div><div class="ud">メール・提案書の下書きを作る</div></div>
+      <div class="ucard"><div class="til"><img src="assets/isometric/research.png" alt=""></div><div class="ut">情報収集</div><div class="ud">市場・競合の情報を調べる</div></div>
+      <div class="ucard"><div class="til"><img src="assets/isometric/summary.png" alt=""></div><div class="ut">情報整理</div><div class="ud">資料やメモの要点をまとめる</div></div>
+      <div class="ucard"><div class="til"><img src="assets/isometric/image-making.png" alt=""></div><div class="ut">画像・動画生成</div><div class="ud">POPや提案イメージを作る</div></div>
+      <div class="ucard"><div class="til"><img src="assets/isometric/research.png" alt=""></div><div class="ut">データ分析</div><div class="ud">数字の傾向や違いを見つける</div></div>
+      <div class="ucard"><div class="til"><img src="assets/isometric/ideas.png" alt=""></div><div class="ut">企画立案</div><div class="ud">新商品や集客の施策を考える</div></div>
+      <div class="ucard"><div class="til"><img src="assets/isometric/conversation.png" alt=""></div><div class="ut">対話練習</div><div class="ud">営業・接客の受け答えを練習する</div></div>
+      <div class="ucard"><div class="til"><img src="assets/isometric/automation.png" alt=""></div><div class="ut">ツール作成</div><div class="ud">計算や定型業務の道具を作る</div></div>
+    </div>
+    <div class="foot"><span class="en">WHAT GEMINI CAN DO</span><span><span class="num"></span></span></div>
+  </section>
+
+  <!-- 9 CAPABILITIES USED TODAY -->
+  <section class="slide top">
+    <div class="eyebrow" data-anim style="--d:60"><span class="en">TODAY'S DEMO</span>　／　本日の実演で紹介する機能</div>
+    <h2 class="h-m" data-anim style="--d:160;margin-top:8px">画像づくり・情報収集・<span class="grad">企画書づくり</span>を実演。</h2>
+    <div class="usegrid pick gap-s" data-anim style="--d:320">
+      <div class="ucard on"><span class="wk">実演</span><div class="til"><img src="assets/isometric/drafting.png" alt=""></div><div class="ut">文章生成</div><div class="ud">メール・提案書の下書きを作る</div></div>
+      <div class="ucard on"><span class="wk">実演</span><div class="til"><img src="assets/isometric/research.png" alt=""></div><div class="ut">情報収集</div><div class="ud">市場・競合の情報を調べる</div></div>
+      <div class="ucard"><div class="til"><img src="assets/isometric/summary.png" alt=""></div><div class="ut">情報整理</div><div class="ud">資料やメモの要点をまとめる</div></div>
+      <div class="ucard on"><span class="wk">実演</span><div class="til"><img src="assets/isometric/image-making.png" alt=""></div><div class="ut">画像・動画生成</div><div class="ud">POPや提案イメージを作る</div></div>
+      <div class="ucard"><div class="til"><img src="assets/isometric/research.png" alt=""></div><div class="ut">データ分析</div><div class="ud">数字の傾向や違いを見つける</div></div>
+      <div class="ucard on"><span class="wk">実演</span><div class="til"><img src="assets/isometric/ideas.png" alt=""></div><div class="ut">企画立案</div><div class="ud">新商品や集客の施策を考える</div></div>
+      <div class="ucard"><div class="til"><img src="assets/isometric/conversation.png" alt=""></div><div class="ut">対話練習</div><div class="ud">営業・接客の受け答えを練習する</div></div>
+      <div class="ucard"><div class="til"><img src="assets/isometric/automation.png" alt=""></div><div class="ut">ツール作成</div><div class="ud">計算や定型業務の道具を作る</div></div>
+    </div>
+    <div class="foot"><span class="en">TODAY'S DEMO</span><span><span class="num"></span></span></div>
+  </section>
+
+  <!-- 10 SECTION 02 -->
+  <section class="slide">
+    <div class="orb drift" style="width:480px;height:480px;right:-120px;top:-150px;opacity:.42"></div>
+    <div class="secno grad">02</div>
+    <div class="group" style="position:relative;z-index:2">
+      <div class="kicker work" data-anim style="--d:40">SECTION 02　・　講師による実演</div>
+      <h1 data-anim style="--d:180">Gemini<br><span class="grad">活用の実演。</span></h1>
+      <div class="lead" data-anim style="--d:380;margin-top:24px">外構のデザインを変える。<br>次に、商品写真からPOPを作る。</div>
+    </div>
+    <div class="foot"><span class="en">DEMONSTRATION</span><span class="num"></span></div>
+  </section>
+
+  <!-- 11 WORK01 RESULT -->
+  <section class="slide top">
+    <div class="eyebrow" data-anim style="--d:60"><span class="en">DEMO 01</span>　／　完成イメージ</div>
+    <h2 class="h-s" data-anim style="--d:160;margin-top:8px">外構のデザインを変えて、<span class="grad">完成後をイメージ。</span></h2>
+    <div class="lead" data-anim style="--d:240;font-size:19px;margin-top:6px">住宅の写真から、玄関までの道・植物・ポストの提案画像へ。</div>
+    <div class="cmp2 gap-s">
+      <div data-anim style="--d:340"><div class="frame"><img src="assets/img/work-house-before-v2.png" alt="変更前の外構"><span class="tag top">元の写真</span></div><div class="cap sub">変更前の外構</div></div>
+      <div class="arrowc" data-anim style="--d:460">→</div>
+      <div data-anim style="--d:560"><div class="frame"><img src="assets/img/work-house-gemini-actual.jpg" alt="玄関までの道・植物・ポストを変更"><span class="tag top g">完成イメージ</span></div><div class="cap">玄関までの道・植物・ポストを変更</div></div>
+    </div>
+    <div class="note" data-anim style="--d:680;margin-top:14px;align-self:center">この写真と指示文でGeminiが生成した例です。生成結果は毎回異なります。</div>
+    <div class="foot"><span class="en">DEMO 01 · EXTERIOR</span><span><span class="num"></span></span></div>
+  </section>
+
+  <!-- 12 WORK01 TASK -->
+  <section class="slide top">
+    <div class="kicker work" data-anim style="--d:40">DEMO 01　・　実演する内容</div>
+    <h2 class="h-s" data-anim style="--d:160">外構のデザインを、<span class="grad">変える実演。</span></h2>
+    <div class="practice gap-s">
+      <div class="material" data-anim="scale" style="--d:300">
+        <div class="frame"><img src="assets/img/work-house-before-v2.png" alt="実演01の元写真"><span class="tag top">使う写真</span></div>
+        <a class="dl iw-download" href="assets/img/work-house-before-v2.png" download="外構実演_元の写真.png"><svg viewBox="0 0 24 24"><path d="M12 4v11"/><path d="M7 10l5 5 5-5"/><path d="M5 20h14"/></svg>画像を保存</a>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:20px">
+        <div class="lead" data-anim style="--d:380;font-size:20px">写真を添付して、<b>変えたいところを短く</b>伝えます。</div>
+        <ol class="steps" data-anim style="--d:440"><li><span class="no-c">1</span>写真を添付</li><li><span class="no-c">2</span>指示文を貼り付け</li><li><span class="no-c g">3</span>送信して確認</li></ol>
+        <div class="prompt lg" data-anim style="--d:540"><pre>玄関までの道を石畳にして、
+植物とポストを追加して。</pre><div class="pfoot"><img class="adviser" src="assets/isometric/image-making.png" alt="" style="width:96px;height:96px"><button class="copy-btn">指示文をコピー</button></div></div>
+      </div>
+    </div>
+    <div class="foot"><span class="en">DEMO 01 · HOW TO</span><span><span class="num"></span></span></div>
+  </section>
+
+  <!-- 13 WORK01 OPERATION -->
+  <section class="slide dense">
+    <div class="eyebrow" data-anim style="--d:60"><span class="en">GEMINI</span>　／　実演の操作</div>
+    <h2 class="h-s" data-anim style="--d:160;margin-top:6px">実演の操作<span class="grad">（外構のイメージ）</span></h2>
+    <div class="opstack gap-xs">
+      <div class="oprow" data-anim style="--d:300"><div class="ol"><div class="oph"><span class="no-c g">1</span>＋を押す</div></div><div class="shot"><img src="assets/img/gemini-user-step1.png" alt="Geminiの入力欄。左側のプラスボタンを押す" style="width:600px"><span class="mk" style="left:3.3%;top:65.3%;width:6.6%;height:23.4%"></span></div></div>
+      <div class="oprow" data-anim style="--d:420"><div class="ol"><div class="oph"><span class="no-c g">2</span>ファイルをアップロード</div><div class="opp">保存した教材画像を選びます。</div></div><div class="shot"><img src="assets/img/gemini-user-step2.png" alt="ファイルをアップロードを選択" style="width:600px"><span class="mk" style="left:4.8%;top:79.5%;width:35.9%;height:20.1%"></span></div></div>
+      <div class="oprow" data-anim style="--d:540"><div class="ol"><div class="oph"><span class="no-c g">3</span>プロンプトを入力</div></div><div class="shot"><img src="assets/img/gemini-user-step3.png" alt="玄関までの道を石畳にして、植物とポストを追加して。とプロンプトを入力した画面" style="width:600px"><span class="mk" style="left:4.1%;top:17.5%;width:89.4%;height:37.7%"></span></div></div>
+    </div>
+    <div class="foot"><span class="en">STEP · UPLOAD &amp; SEND</span><span><span class="num"></span></span></div>
+  </section>
+
+  <!-- 14 WORK02 RESULT -->
+  <section class="slide top">
+    <div class="eyebrow" data-anim style="--d:60"><span class="en">DEMO 02</span>　／　完成イメージ</div>
+    <h2 class="h-s" data-anim style="--d:160;margin-top:8px">商品写真から、<span class="grad">お店で使うPOPへ。</span></h2>
+    <div class="lead" data-anim style="--d:240;font-size:19px;margin-top:6px">商品名と価格を伝えて、手に取りたくなる見せ方を考えます。</div>
+    <div class="cmp2 gap-s">
+      <div data-anim style="--d:340"><div class="frame"><img src="assets/img/work-product.png" alt="焼き菓子3個セットの商品写真"><span class="tag top">元の写真</span></div><div class="cap sub">焼き菓子3個セットの商品写真</div></div>
+      <div class="arrowc" data-anim style="--d:460">→</div>
+      <div data-anim style="--d:560"><div class="frame"><img src="assets/img/work-pop-gemini-actual.jpg" alt="商品名と価格が伝わる店頭POP"><span class="tag top g">完成イメージ</span></div><div class="cap">商品名と価格が伝わる店頭POP</div></div>
+    </div>
+    <div class="note" data-anim style="--d:680;margin-top:14px;align-self:center">この写真と指示文でGeminiが生成した例です。追加された宣伝文句は、事実に合うか確認します。</div>
+    <div class="foot"><span class="en">DEMO 02 · POP</span><span><span class="num"></span></span></div>
+  </section>
+
+  <!-- 15 WORK02 TASK -->
+  <section class="slide top">
+    <div class="kicker work" data-anim style="--d:40">DEMO 02　・　実演する内容</div>
+    <h2 class="h-s" data-anim style="--d:160">商品写真を使って、<span class="grad">店頭POP（ポップ）</span>を作る実演。</h2>
+    <div class="practice gap-s">
+      <div class="material" data-anim="scale" style="--d:300">
+        <div class="frame"><img src="assets/img/work-product.png" alt="実演02の商品写真"><span class="tag top">使う写真</span></div>
+        <a class="dl iw-download" href="assets/img/work-product.png" download="POP実演_商品写真.png"><svg viewBox="0 0 24 24"><path d="M12 4v11"/><path d="M7 10l5 5 5-5"/><path d="M5 20h14"/></svg>画像を保存</a>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:20px">
+        <div class="lead" data-anim style="--d:380;font-size:20px">写真を添付して、<b>商品名と価格</b>を伝えます。</div>
+        <ol class="steps" data-anim style="--d:440"><li><span class="no-c">1</span>写真を添付</li><li><span class="no-c">2</span>指示文を貼り付け</li><li><span class="no-c g">3</span>送信して確認</li></ol>
+        <div class="prompt lg" data-anim style="--d:540"><pre>この写真で店頭POPを作って。
+焼き菓子3個セット、税込600円。</pre><div class="pfoot"><img class="adviser" src="assets/isometric/image-making.png" alt="" style="width:96px;height:96px"><button class="copy-btn">指示文をコピー</button></div></div>
+      </div>
+    </div>
+    <div class="foot"><span class="en">DEMO 02 · HOW TO</span><span><span class="num"></span></span></div>
+  </section>
+
+  <!-- 16 WORK02 OPERATION -->
+  <section class="slide dense">
+    <div class="eyebrow" data-anim style="--d:60"><span class="en">GEMINI</span>　／　実演の操作</div>
+    <h2 class="h-s" data-anim style="--d:160;margin-top:6px">実演の操作<span class="grad">（店頭POP）</span></h2>
+    <div class="opstack gap-xs">
+      <div class="oprow" data-anim style="--d:300"><div class="ol"><div class="oph"><span class="no-c g">1</span>＋を押す</div></div><div class="shot"><img src="assets/img/gemini-user-step1.png" alt="Geminiの入力欄。左側のプラスボタンを押す" style="width:600px"><span class="mk" style="left:3.3%;top:65.3%;width:6.6%;height:23.4%"></span></div></div>
+      <div class="oprow" data-anim style="--d:420"><div class="ol"><div class="oph"><span class="no-c g">2</span>ファイルをアップロード</div><div class="opp">保存した教材画像を選びます。</div></div><div class="shot"><img src="assets/img/gemini-user-step2.png" alt="ファイルをアップロードを選択" style="width:600px"><span class="mk" style="left:4.8%;top:79.5%;width:35.9%;height:20.1%"></span></div></div>
+      <div class="oprow" data-anim style="--d:540"><div class="ol"><div class="oph"><span class="no-c g">3</span>プロンプトを入力</div></div><div class="shot"><img src="assets/img/gemini-pop-input.png" alt="この写真で店頭POPを作って。焼き菓子3個セット、税込600円。と入力したGeminiの実画面" style="width:600px"><span class="mk" style="left:3.5%;top:12%;width:91%;height:42%"></span></div></div>
+    </div>
+    <div class="foot"><span class="en">STEP · UPLOAD &amp; SEND</span><span><span class="num"></span></span></div>
+  </section>
+
+  <!-- 17 SECTION 03 -->
+  <section class="slide">
+    <div class="orb drift" style="width:480px;height:480px;right:-120px;top:-150px;opacity:.42"></div>
+    <div class="secno grad">03</div>
+    <div class="group" style="position:relative;z-index:2">
+      <div class="kicker work" data-anim style="--d:40">SECTION 03　・　講師による実演</div>
+      <h1 data-anim style="--d:180">売上UPの<br><span class="grad">施策を作る。</span></h1>
+      <div class="lead" data-anim style="--d:380;margin-top:24px">Deep Research → 施策を考える → 提案用のスライドにまとめる</div>
+    </div>
+    <div class="foot"><span class="en">SALES UP DEMONSTRATION</span><span class="num"></span></div>
+  </section>
+
+  <!-- 18 SALES FLOW -->
+  <section class="slide top">
+    <div class="eyebrow" data-anim style="--d:60"><span class="en">FLOW</span>　／　実演の流れ</div>
+    <h2 class="h-m" data-anim style="--d:160;margin-top:8px">調べる → 深掘りする → <span class="grad">スライドにまとめる。</span></h2>
+    <div class="lead" data-anim style="--d:240;font-size:19px;margin-top:6px">電気・設備工事会社を例に、調査から提案資料の作成までを実演します。</div>
+    <div class="flow gap-s" data-anim style="--d:340">
+      <div class="fcard"><div class="st">STEP 1</div><div class="ft">Deep Research</div><div class="til"><img src="assets/isometric/deep-research.png" alt="複数の情報を調べてレポートにまとめる人物"></div><div class="fs">売上UPの事例を調べる</div><div class="fd">同業の会社の事例を<strong>5つ</strong>集めます。</div></div>
+      <div class="farrow">→</div>
+      <div class="fcard mid"><div class="st">STEP 2</div><div class="ft">深掘り</div><div class="til"><img src="assets/isometric/conversation.png" alt="自社の施策について考える人物"></div><div class="fs">条件に合う施策を選ぶ</div><div class="fd">顧客層・営業体制を伝え、来月の施策を<strong>1つ</strong>に絞ります。</div></div>
+      <div class="farrow">→</div>
+      <div class="fcard"><div class="st">STEP 3</div><div class="ft">スライド作成</div><div class="til"><img src="assets/img/canvas-user-result-v2.png" alt="今回の指示文で実際に生成された3枚目。まず1社にアプローチする3ステップ"></div><div class="fs">Canvasで提案資料に</div><div class="fd">施策・期待効果・来月の行動を<strong>3枚のスライド</strong>にまとめます。</div></div>
+    </div>
+    <div class="foot"><span class="en">DEMONSTRATION FLOW</span><span><span class="num"></span></span></div>
+  </section>
+
+  <!-- 19 WHAT IS DEEP RESEARCH -->
+  <section class="slide">
+    <div style="display:flex;gap:52px;width:100%;align-items:center">
+      <div class="frame white contain" data-anim="scale" style="--d:300;flex:0 0 440px;height:360px"><img src="assets/isometric/deep-research.png" alt="複数のWebページや資料を虫眼鏡で調べ、出典つきのレポートに整理する人物のイラスト"></div>
+      <div style="flex:1">
+        <div class="eyebrow" data-anim style="--d:60"><span class="en">STEP 1</span>　／　機能紹介</div>
+        <h2 class="h-m" data-anim style="--d:160;margin-top:8px"><span class="grad">Deep Research</span>とは？</h2>
+        <div class="lead" data-anim style="--d:240;font-size:19px;margin-top:8px">複数のWebサイトを調べ、出典つきのレポートにまとめる機能です。</div>
+        <div class="pe gap-xs" data-anim style="--d:380">
+          <div class="perow"><div class="lab"><span class="no">01</span></div><div class="ex"><b>複数の情報源を調べる</b><br>テーマに合わせて調査計画を立て、Web上の情報を集めます。</div></div>
+          <div class="perow"><div class="lab"><span class="no">02</span></div><div class="ex"><b>要点を整理してまとめる</b><br>集めた情報を比較・整理し、レポートにします。</div></div>
+          <div class="perow"><div class="lab"><span class="no">03</span></div><div class="ex"><b>出典から元の情報を確認できる</b><br>事例や数字の根拠を、リンク先で確かめられます。</div></div>
+        </div>
+        <a class="note reflink" data-anim style="--d:500;display:inline-block;margin-top:12px;font-size:13px" href="https://support.google.com/gemini/answer/15719111" target="_blank" rel="noopener">参考：Google公式ヘルプ</a>
+      </div>
+    </div>
+    <div class="foot"><span class="en">WHAT IS DEEP RESEARCH</span><span><span class="num"></span></span></div>
+  </section>
+
+  <!-- 20 STEP1 TASK -->
+  <section class="slide">
+    <div class="group">
+      <div class="kicker work" data-anim style="--d:40">STEP 1　・　実演する内容</div>
+      <h2 class="h-m" data-anim style="--d:160">Deep Researchで、<span class="grad">同業の事例</span>を調べる実演。</h2>
+      <div class="lead" data-anim style="--d:240;font-size:20px;margin-top:10px">地域・業種・社員数を、<b>自社に置き換えて</b>入力します。</div>
+      <ol class="steps gap-s" data-anim style="--d:340"><li><span class="no-c">1</span>「＋」→ Deep Research</li><li><span class="no-c">2</span>指示文を入力・送信</li><li><span class="no-c g">3</span>計画を確認 → リサーチを開始</li></ol>
+      <div class="prompt lg gap-xs" data-anim style="--d:460"><pre data-copy="東海市の電気・設備工事会社です。&#10;社員30人の会社が真似できる売上UP事例を5つ調べて。">東海市の電気・設備工事会社<span class="rep">※</span>です。
+社員30人<span class="rep">※</span>の会社が真似できる売上UP事例を5つ調べて。</pre><div class="pfoot"><span class="note">※ 実演では、東海市・電気設備工事・社員30人の会社を想定します。</span><button class="copy-btn">指示文をコピー</button></div></div>
+    </div>
+    <div class="foot"><span class="en">STEP 1 · RESEARCH</span><span><span class="num"></span></span></div>
+  </section>
+
+  <!-- 21 DEEP RESEARCH OPERATION -->
+  <section class="slide dense">
+    <div class="eyebrow" data-anim style="--d:60"><span class="en">STEP 1</span>　／　実演の操作</div>
+    <h2 class="h-s" data-anim style="--d:160;margin-top:6px">実演の操作<span class="grad">（Deep Research）</span></h2>
+    <div style="display:flex;gap:40px;width:100%;margin-top:20px">
+      <div data-anim style="--d:300;flex:0 0 520px;display:flex;flex-direction:column;gap:12px">
+        <div class="oph"><span class="no-c g">1</span>＋を押す</div>
+        <div class="shot"><img src="assets/img/deepresearch-user-step1.png" alt="Gemini入力欄の左側にあるプラスボタン" style="width:520px"><span class="mk" style="left:4.2%;top:37%;width:5.4%;height:36%"></span></div>
+        <div class="oph" style="margin-top:8px"><span class="no-c g">2</span>その他のツール → Deep Research</div>
+        <div class="shot"><img src="assets/img/deepresearch-user-step2.png" alt="その他のツールを開き、Deep Researchを選択" style="width:520px"><span class="mk" style="left:5.3%;top:85.6%;width:34.6%;height:10.6%"></span><span class="mk" style="left:40.8%;top:73.8%;width:30.4%;height:10.2%"></span></div>
+      </div>
+      <div data-anim style="--d:440;flex:1;display:flex;flex-direction:column;gap:12px">
+        <div class="oph"><span class="no-c g">3</span>指示文を入力して送信</div>
+        <div class="shot"><img src="assets/img/deepresearch-user-step3-v2.png" alt="Deep Researchを選択して指示文を入力した画面。右の上向き矢印で送信" style="width:540px"><span class="mk" style="left:91.3%;top:44.2%;width:5.6%;height:19.4%"></span></div>
+        <div class="oph" style="margin-top:8px"><span class="no-c g">4</span>計画を確認して、リサーチを開始</div>
+        <div style="display:flex;gap:20px;align-items:flex-end">
+          <div class="shot"><img src="assets/img/deepresearch-user-step4.png" alt="調査計画を確認し、右下のリサーチを開始ボタンを押す" style="height:250px"><span class="mk" style="left:63.5%;top:87.4%;width:31%;height:7.8%"></span></div>
+          <div class="lead" style="font-size:17px;line-height:1.6">調べたい内容に<br>なっているかを確認し、<br><b>青いボタン</b>を押します。</div>
+        </div>
+      </div>
+    </div>
+    <div class="foot"><span class="en">STEP 1 · OPERATION</span><span><span class="num"></span></span></div>
+  </section>
+
+  <!-- 22 DEEP RESEARCH RESULT -->
+  <section class="slide dense">
+    <div class="eyebrow" data-anim style="--d:60"><span class="en">STEP 1</span>　／　調査結果の例</div>
+    <h2 class="h-s" data-anim style="--d:160;margin-top:6px">Geminiが調べた施策を、<span class="grad">見てみます。</span></h2>
+    <div class="shot" data-anim="scale" style="--d:320;margin-top:22px;align-self:center"><img src="assets/img/deepresearch-user-result.png" alt="GeminiのDeep Researchがまとめた、社員30人規模の電気・設備工事会社向け売上UP事例の調査レポート" style="width:950px"></div>
+    <div class="foot"><span class="en">STEP 1 · RESULT</span><span><span class="num"></span></span></div>
+  </section>
+
+  <!-- 23 STEP2 TASK -->
+  <section class="slide">
+    <div class="group">
+      <div class="kicker work" data-anim style="--d:40">STEP 2　・　実演で使う指示文</div>
+      <h2 class="h-m" data-anim style="--d:160">来月できる、売上UPの施策を<br><span class="grad">1つに絞る実演。</span></h2>
+      <div class="lead" data-anim style="--d:240;font-size:20px;margin-top:12px"><b>同じチャットで</b>、顧客層や営業体制を短く追加します。</div>
+      <div class="prompt lg gap-s" data-anim style="--d:400"><pre data-copy="既存客は地元の工場が中心。営業専任は不在です。&#10;調査の5事例から来月試せる施策を1つ選び、最初の行動を教えて。">既存客は地元の工場が中心。営業専任は不在です。<span class="rep">※</span>
+調査の5事例から来月試せる施策を1つ選び、最初の行動を教えて。</pre><div class="pfoot"><span class="note">※ 実演では、地元の工場が主な顧客・営業専任なしと想定します。</span><button class="copy-btn">指示文をコピー</button></div></div>
+    </div>
+    <div class="foot"><span class="en">STEP 2 · DIG DEEPER</span><span><span class="num"></span></span></div>
+  </section>
+
+  <!-- 24 STEP2 OPERATION -->
+  <section class="slide dense">
+    <div class="eyebrow" data-anim style="--d:60"><span class="en">STEP 2</span>　／　実演の操作</div>
+    <h2 class="h-s" data-anim style="--d:160;margin-top:6px">実演の操作<span class="grad">（施策を1つに絞る）</span></h2>
+    <div style="display:flex;gap:40px;width:100%;margin-top:20px">
+      <div data-anim style="--d:300;flex:0 0 480px;display:flex;flex-direction:column;gap:12px">
+        <div class="oph"><span class="no-c g">1</span>Deep Researchの「×」を押す</div>
+        <div style="display:flex;gap:18px;align-items:flex-end">
+          <div class="shot"><img src="assets/img/action-user-step1.png" alt="調査が完了した同じチャット。入力欄でDeep Researchが選択されている" style="height:350px"><span class="mk" style="left:10.1%;top:91.6%;width:30.3%;height:5.6%"></span></div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div class="note" style="font-weight:800;color:var(--ink)">「×」は、この位置です。</div>
+            <div class="shot"><img src="assets/img/deepresearch-exit-user.png" alt="Deep Researchの右端の×が表示された実画面" style="width:200px"><span class="mk" style="left:38.9%;top:58.5%;width:5.4%;height:22.2%"></span></div>
+          </div>
+        </div>
+      </div>
+      <div data-anim style="--d:440;flex:1;display:flex;flex-direction:column;gap:12px">
+        <div class="oph"><span class="no-c g">2</span>プロンプトを入力して「↑」で送信</div>
+        <div class="shot"><img src="assets/img/action-user-step2.png" alt="Deep Researchを解除後、同じチャットに顧客層と営業体制を追加し、施策を1つ選ぶ指示を入力した画面" style="width:580px"><span class="mk" style="left:89.5%;top:87.2%;width:5.3%;height:8.1%"></span></div>
+      </div>
+    </div>
+    <div class="foot"><span class="en">STEP 2 · OPERATION</span><span><span class="num"></span></span></div>
+  </section>
+
+  <!-- 25 STEP3 TASK -->
+  <section class="slide">
+    <div class="group">
+      <div class="kicker work" data-anim style="--d:40">STEP 3　・　実演で使う指示文</div>
+      <h2 class="h-m" data-anim style="--d:160">選んだ施策を、<span class="grad">3枚のスライド</span>に<br>まとめる実演。</h2>
+      <div class="lead" data-anim style="--d:240;font-size:20px;margin-top:12px"><b>新しいチャットでCanvas</b>を選び、指示文の下に回答を貼り付けます。</div>
+      <div class="prompt lg gap-s" data-anim style="--d:400"><pre>以下の内容を、施策・期待効果・来月の行動の3枚のスライドにして。
+イラストや図を多く使って、文字は大きく少なめに。</pre><div class="pfoot"><span class="note">この指示文の下に、先ほど選んだ施策の回答を貼り付けて送信します。</span><button class="copy-btn">指示文をコピー</button></div></div>
+    </div>
+    <div class="foot"><span class="en">STEP 3 · CANVAS</span><span><span class="num"></span></span></div>
+  </section>
+
+  <!-- 26 STEP3 OPERATION -->
+  <section class="slide dense">
+    <div class="eyebrow" data-anim style="--d:60"><span class="en">STEP 3</span>　／　実演の操作</div>
+    <h2 class="h-s" data-anim style="--d:160;margin-top:6px">実演の操作<span class="grad">（Canvasでスライドを作る）</span></h2>
+    <div data-anim style="--d:300;display:grid;grid-template-columns:1fr 1fr;gap:16px 40px;width:100%;margin-top:18px">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="oph"><span class="no-c g">1</span>回答の「コピー」を押す</div>
+        <div class="shot" style="width:500px;height:180px;overflow:hidden"><img src="assets/img/canvas-user-step1.png" alt="施策の回答の下にある回答をコピーボタン" style="width:500px;height:180px;object-fit:cover;object-position:center bottom"><span class="mk" style="left:9.5%;top:25%;width:5%;height:14.5%"></span></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="oph"><span class="no-c g">2</span>左上の「チャットを新規作成」</div>
+        <div class="shot" style="align-self:flex-start"><img src="assets/img/canvas-user-step2.png" alt="画面左上のチャットを新規作成" style="height:180px"><span class="mk" style="left:4%;top:21%;width:14%;height:13%"></span></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="oph"><span class="no-c g">3</span>「＋」→「Canvas」を選択</div>
+        <div class="shot" style="align-self:flex-start"><img src="assets/img/canvas-user-step3.png" alt="新しいチャットのプラスメニューからCanvasを選択" style="height:200px"><span class="mk" style="left:5.8%;top:77.5%;width:34.5%;height:10.5%"></span></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="oph"><span class="no-c g">4</span>指示文と回答を貼り付けて送信</div>
+        <div class="shot" style="align-self:flex-start"><img src="assets/img/canvas-user-step4-v2.png" alt="指示文の下にコピーした回答を貼り付けてCanvasで送信" style="width:500px"><span class="mk" style="left:91.6%;top:78%;width:5.7%;height:14%"></span></div>
+      </div>
+    </div>
+    <div class="foot"><span class="en">STEP 3 · OPERATION</span><span><span class="num"></span></span></div>
+  </section>
+
+  <!-- 27 PRESENT -->
+  <section class="slide">
+    <div style="display:flex;gap:52px;width:100%;align-items:center">
+      <div style="flex:1">
+        <div class="kicker work" data-anim style="--d:40">実演のまとめ</div>
+        <h2 class="h-m" data-anim style="--d:160">調べた内容が、<br><span class="grad">提案資料に。</span></h2>
+        <div class="lead" data-anim style="--d:320;font-size:21px;margin-top:22px">講師が作成した資料をお見せします。<b>施策・期待効果・次の行動</b>まで、一連の流れで形にできます。</div>
+      </div>
+      <div class="frame white contain" data-anim="scale" style="--d:300;flex:0 0 560px;height:400px"><img src="assets/isometric/presentation.png" alt="グループのメンバーに資料を見せながら発表している人物イラスト"></div>
+    </div>
+    <div class="foot"><span class="en">PRESENTATION</span><span><span class="num"></span></span></div>
+  </section>
+
+  <!-- 28 SECTION 04 -->
+  <section class="slide">
+    <div class="orb drift" style="width:480px;height:480px;right:-120px;top:-150px;opacity:.42"></div>
+    <div class="secno grad">04</div>
+    <div class="group" style="position:relative;z-index:2">
+      <div class="kicker" data-anim style="--d:40">SECTION 04</div>
+      <h1 data-anim style="--d:180;font-size:76px">主な活用事例と<br><span class="grad">気を付けること。</span></h1>
+      <div class="lead" data-anim style="--d:380;margin-top:24px">仕事での使いどころと、安心して活用するための基本。</div>
+    </div>
+    <div class="foot"><span class="en">USE CASES &amp; SAFETY</span><span class="num"></span></div>
+  </section>
+
+  <!-- 29 CASES -->
+  <section class="slide top">
+    <div class="eyebrow" data-anim style="--d:60"><span class="en">USE CASES</span>　／　活用事例</div>
+    <h2 class="h-m" data-anim style="--d:160;margin-top:8px">実務で使える、<span class="grad">AI活用の事例。</span></h2>
+    <div class="lead" data-anim style="--d:240;font-size:19px;margin-top:6px">読み取り・整理から、図面の活用、立体での見える化まで。</div>
+    <div class="cases gap-s" data-anim style="--d:340">
+      <div class="ccard"><img src="assets/isometric/reports.png" alt="請求書を確認する事務担当者"><div class="cb"><div class="cl">01 ／ 事務・原価管理</div><div class="ct">請求書の読み取りと<br>原価の振り分け</div><div class="cd">請求書の明細を読み取り、工事ごとの原価に振り分ける。</div></div></div>
+      <div class="ccard"><img src="assets/isometric/fact-check.png" alt="製作図から部材を拾う積算担当者"><div class="cb"><div class="cl">02 ／ 積算</div><div class="ct">図面からの積算</div><div class="cd">図面から部材と数量を拾い、見積の下書きを作る。</div></div></div>
+      <div class="ccard"><img src="assets/img/otagawa-cover-entrance.png" alt="AIで作った太田川駅の3D模型"><div class="cb"><div class="cl">03 ／ 立体で伝える</div><div class="ct">太田川駅の3D模型化</div><div class="cd">公開情報をもとに、回転・断面表示できる模型を作る。</div><a class="demo" href="demo/otagawa-3d.html" target="_blank" rel="noopener">3D模型を見る ↗</a></div></div>
+    </div>
+    <div class="note" data-anim style="--d:480;margin-top:14px">業務の仕組みと組み合わせた活用例です。読み取り・積算は人が確認。3D模型には推定を含みます。</div>
+    <div class="foot"><span class="en">USE CASES</span><span><span class="num"></span></span></div>
+  </section>
+
+  <!-- 30 SAFETY -->
+  <section class="slide dense">
+    <div class="eyebrow" data-anim style="--d:60"><span class="en">SAFETY</span>　／　気を付けること</div>
+    <h2 class="h-s" data-anim style="--d:160;margin-top:6px">生成AIを使うときの、<span class="grad">4つの基本。</span></h2>
+    <div class="lead" data-anim style="--d:240;font-size:18px;margin-top:4px">入力する前と、出来上がったものを使う前に確認しましょう。</div>
+    <div class="safe" style="margin-top:18px">
+      <div class="scard" data-anim style="--d:320"><img class="sill" src="assets/isometric/privacy.png" alt="情報を守る人"><div><div class="sn">01</div><div class="stt">無料・未承認の環境に、仕事の情報を入れない</div><div class="sd">個人情報・顧客情報・未公開の図面や金額は入力しない。仕事では会社が認めた環境を使う。</div></div></div>
+      <div class="scard" data-anim style="--d:400"><img class="sill" src="assets/isometric/fact-check.png" alt="学習設定を確認する人"><div><div class="sn">02</div><div class="stt">有料でも、学習設定を確認する</div><div class="sd">モデル改善への利用をオフにできる場合は設定。法人契約はデータ保護の条件を確認する。</div></div></div>
+      <div class="scard" data-anim style="--d:480"><img class="sill" src="assets/isometric/privacy.png" alt="鍵を守る人"><div><div class="sn">03</div><div class="stt">APIキーは、パスワードと同じ扱い</div><div class="sd">チャット・共有資料・公開サイトに貼らない。漏れた場合は無効化し、作り直す。</div></div></div>
+      <div class="scard" data-anim style="--d:560"><img class="sill" src="assets/isometric/conversation.png" alt="内容を確認する人たち"><div><div class="sn">04</div><div class="stt">公開・送信の前に、人が確認する</div><div class="sd">数字・事実・画像の権利を確認。AIにメール送信や削除を任せるときも、実行前に確認する。</div></div></div>
+    </div>
+    <div class="note" data-anim style="--d:640;margin-top:12px">無料／有料だけでは判断できません。学習をオフにしても、保存や安全監視がなくなるとは限りません。</div>
+    <div class="srcs" data-anim style="--d:680;margin-top:4px">参考：<a href="https://support.google.com/gemini/answer/13594961?hl=ja" target="_blank" rel="noopener">Geminiのデータ利用</a> ／ <a href="https://support.google.com/gemini/answer/14620100?hl=ja" target="_blank" rel="noopener">法人アカウントの保護</a> ／ <a href="https://ai.google.dev/gemini-api/docs/api-key?hl=ja" target="_blank" rel="noopener">APIキーの扱い</a></div>
+    <div class="foot"><span class="en">4 BASICS</span><span><span class="num"></span></span></div>
+  </section>
+
+  <!-- 31 CLOSE -->
+  <section class="slide">
+    <div class="orb drift" style="width:480px;height:480px;left:-120px;top:-120px;opacity:.42"></div>
+    <div class="orb drift" style="width:420px;height:420px;right:-140px;bottom:-160px;animation-delay:-5s"></div>
+    <div class="group" style="position:relative;z-index:2">
+      <h1 data-anim style="--d:120;font-size:76px">明日から、<br><span class="grad">1つ試してみよう。</span></h1>
+      <div class="lead" data-anim style="--d:360;margin-top:26px;font-size:25px">ご清聴ありがとうございました。</div>
+    </div>
+    <div class="foot"><span class="en">THANK YOU</span></div>
+  </section>
+
+</div></div>
+
+<button class="arrowbtn" id="prev">‹</button>
+<button class="arrowbtn" id="next">›</button>
+<div id="nav"></div>
+<div class="hint">← → / クリック / F 全画面</div>
+
+<script>
+const deck=document.getElementById('deck');
+const slides=[...document.querySelectorAll('.slide')];
+let i=0;
+function fit(){const s=Math.min(innerWidth/1300,innerHeight/740);deck.style.transform='scale('+s+')';}
+addEventListener('resize',fit);fit();
+const nav=document.getElementById('nav');
+slides.forEach((_,k)=>{const d=document.createElement('div');d.className='dot';d.onclick=()=>go(k);nav.appendChild(d);});
+const dots=[...nav.children];
+slides.forEach((s,k)=>{s.querySelectorAll('.num').forEach(n=>n.textContent=String(k+1).padStart(2,'0'));});
+function go(n){i=Math.max(0,Math.min(slides.length-1,n));
+  slides.forEach((s,k)=>s.classList.toggle('is-active',k===i));
+  dots.forEach((d,k)=>d.classList.toggle('on',k===i));
+  document.getElementById('bar').style.width=((i+1)/slides.length*100)+'%';
+  history.replaceState(null,'','#'+(i+1));
+}
+document.getElementById('next').onclick=()=>go(i+1);
+document.getElementById('prev').onclick=()=>go(i-1);
+addEventListener('keydown',e=>{
+  if(e.target.closest('button,a,input,textarea,select'))return;
+  if(['ArrowRight','ArrowDown',' ','PageDown'].includes(e.key)){go(i+1);e.preventDefault();}
+  else if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){go(i-1);e.preventDefault();}
+  else if(e.key==='f'||e.key==='F'){if(!document.fullscreenElement)document.documentElement.requestFullscreen();else document.exitFullscreen();}
+  else if(e.key==='Home')go(0);
+  else if(e.key==='End')go(slides.length-1);
+});
+let sx=0;addEventListener('touchstart',e=>sx=e.touches[0].clientX,{passive:true});
+addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>50)go(i+(dx<0?1:-1));},{passive:true});
+deck.addEventListener('click',e=>{if(e.target.closest('a,button,pre,.prompt'))return;const r=deck.getBoundingClientRect();go(i+((e.clientX-r.left)/r.width>0.5?1:-1));});
+go((parseInt(location.hash.slice(1),10)||1)-1);
+
+document.querySelectorAll('.copy-btn').forEach(button=>{
+  button.addEventListener('click',async()=>{
+    const prompt=button.closest('.prompt').querySelector('pre');
+    const text=prompt.dataset.copy || prompt.textContent;
+    let ok=false;
+    try {await navigator.clipboard.writeText(text);ok=true;} catch(e) {
+      const area=document.createElement('textarea');area.value=text;
+      area.style.cssText='position:fixed;left:0;top:0;opacity:0';
+      document.body.append(area);area.select();ok=document.execCommand('copy');area.remove();
+    }
+    const label=button.textContent;button.textContent=ok?'コピーしました':'本文を選択してコピーしてください';
+    setTimeout(()=>button.textContent=label,2500);
+  });
+});
+// ローカルファイルで開いたときだけ、教材画像の保存用データを読み込む
+if (location.protocol === 'file:') {
+  const materials = document.createElement('script');
+  materials.src = 'assets/material-downloads.js';
+  document.body.append(materials);
+}
+</script>
+</body>
+</html>

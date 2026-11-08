@@ -1,0 +1,1538 @@
+<!doctype html>
+<html lang="ja">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>太田川駅 3層高架モデル</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: full-bleed 3D architectural model at true scale (metres); control panel docked right (bottom sheet on phones);
+   floor card bottom-left. Single deliberate light look: a white study model laid on the real aerial photo. */
+:root{
+  --bg:#eef1f3;
+  --panel:#f8f9fa;
+  --line:#cdd4da;
+  --text:#1b2227;
+  --muted:#5b6872;
+  --accent:#c23039;    /* train red: active / selected */
+  --f1:#5f9e93; --f2:#4f7fae; --fm:#8a73b8; --f3:#d4813b;
+  --f-body:"BIZ UDPGothic", "Hiragino Sans", "Yu Gothic UI", "Meiryo", system-ui, sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Consolas, monospace;
+  color-scheme: light;
+}
+html,body{height:100%}
+[hidden]{display:none!important}
+body{margin:0; background:var(--bg); color:var(--text); font-family:var(--f-body); overflow:hidden; -webkit-font-smoothing:antialiased}
+#stage{position:fixed; inset:0; background:var(--bg)}
+#stage canvas{display:block; width:100%; height:100%; touch-action:none; outline:none}
+
+.hud{position:fixed; z-index:2; transition:opacity .35s ease}
+body.clean .hud, body.clean #labels{opacity:0; pointer-events:none}
+body.clean .hud *{pointer-events:none}
+
+#titleblock{top:calc(env(safe-area-inset-top,0px) + 20px); left:24px; display:grid; gap:6px; max-width:min(500px, calc(100vw - 48px)); pointer-events:none;
+  background:color-mix(in srgb, var(--bg) 78%, transparent); padding:10px 14px 12px; margin:-10px 0 0 -14px; border-radius:6px}
+.eyebrow{font-family:var(--f-mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted)}
+h1{margin:0; font-size:27px; font-weight:700; letter-spacing:.04em; line-height:1.25; text-wrap:balance}
+h1 small{font-size:14px; font-weight:400; color:var(--muted); margin-left:10px; letter-spacing:.02em}
+.facts{display:flex; flex-wrap:wrap; gap:4px 16px; font-size:12.5px; color:var(--muted)}
+.facts b{color:var(--text); font-family:var(--f-mono); font-weight:500; font-variant-numeric:tabular-nums}
+.note{font-size:11.5px; color:var(--muted); line-height:1.6}
+
+#panel{
+  top:calc(env(safe-area-inset-top,0px) + 16px); right:16px; bottom:16px; width:300px;
+  background:color-mix(in srgb, var(--panel) 92%, transparent); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+  border:1px solid var(--line); border-radius:6px; display:flex; flex-direction:column; overflow:hidden;
+}
+.pscroll{overflow-y:auto; padding:16px 16px 12px; display:grid; gap:18px}
+#grab{display:none}
+.group{display:grid; gap:10px}
+.group > .eyebrow{padding-bottom:6px; border-bottom:1px solid var(--line)}
+.ctl{display:grid; gap:6px}
+.ctl-head{display:flex; justify-content:space-between; align-items:baseline; font-size:13px}
+.ctl-head output{font-family:var(--f-mono); font-size:12px; color:var(--accent); font-variant-numeric:tabular-nums}
+input[type=range]{-webkit-appearance:none; appearance:none; width:100%; height:22px; background:transparent; margin:0; cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:3px; background:var(--line); border-radius:2px}
+input[type=range]::-moz-range-track{height:3px; background:var(--line); border-radius:2px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:14px; height:14px; margin-top:-5.5px; border-radius:50%; background:var(--accent); border:2px solid var(--panel)}
+input[type=range]::-moz-range-thumb{width:12px; height:12px; border-radius:50%; background:var(--accent); border:2px solid var(--panel)}
+input[type=range]:focus-visible{outline:2px solid var(--f2); outline-offset:2px; border-radius:4px}
+button{font:inherit; font-size:13px; color:var(--text); background:#fff; border:1px solid var(--line); border-radius:4px; padding:8px 10px; cursor:pointer}
+button:hover{background:#eef2f4}
+button:focus-visible{outline:2px solid var(--f2); outline-offset:1px}
+button[aria-pressed=true]{background:#fbeced; color:var(--accent); border-color:#e6b3b6}
+.btnrow3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px}
+.btnrow3 button{padding:7px 4px; font-size:12px}
+#tour{width:100%; background:var(--accent); color:#fff; border-color:var(--accent); font-weight:700}
+#tour:hover{background:#d4434c}
+#tour[aria-pressed=true]{background:#fbeced; color:var(--accent)}
+.seg{display:grid; grid-template-columns:1fr 1fr; border:1px solid var(--line); border-radius:4px; overflow:hidden}
+.seg button{border:0; border-radius:0}
+.seg button + button{border-left:1px solid var(--line)}
+.checks{display:grid; grid-template-columns:1fr 1fr; gap:8px 10px}
+.check{display:flex; align-items:center; gap:8px; font-size:13px; cursor:pointer}
+.check input{accent-color:var(--accent); width:15px; height:15px; margin:0}
+
+#partlist{display:grid; gap:2px; margin:0; padding:0; list-style:none}
+#partlist button{width:100%; display:grid; grid-template-columns:10px 1fr auto; align-items:center; gap:10px; text-align:left; background:transparent; border-color:transparent; padding:7px 8px}
+#partlist button:hover, #partlist button.hov{background:#eaeff2}
+#partlist button[aria-pressed=true]{background:#fbeced; border-color:#e6b3b6}
+#partlist .dot{width:10px; height:10px; border-radius:2px}
+#partlist .lv{font-family:var(--f-mono); font-size:10.5px; color:var(--muted)}
+.hint{font-size:11.5px; color:var(--muted); line-height:1.7; padding:10px 16px 14px; border-top:1px solid var(--line)}
+.credit{font-size:10.5px; color:var(--muted); line-height:1.55; padding:0 16px 12px}
+kbd{font-family:var(--f-mono); font-size:10.5px; border:1px solid var(--line); border-bottom-width:2px; border-radius:3px; padding:0 4px; color:var(--text); background:#fff}
+
+#card{
+  left:24px; bottom:24px; width:min(410px, calc(100vw - 48px));
+  background:color-mix(in srgb, var(--panel) 94%, transparent); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+  border:1px solid var(--line); border-left:3px solid var(--accent); border-radius:4px; padding:14px 16px; display:grid; gap:8px;
+}
+#card .lv{font-family:var(--f-mono); font-size:11px; color:var(--accent); letter-spacing:.08em}
+#card h2{margin:0; font-size:17px}
+#card p{margin:0; font-size:13px; line-height:1.8; color:#34404a; max-width:62ch}
+#card dl{margin:4px 0 0; display:grid; grid-template-columns:auto 1fr; gap:4px 14px; font-size:12.5px}
+#card dt{color:var(--muted); white-space:nowrap}
+#card dd{margin:0}
+#card .close{position:absolute; top:8px; right:8px; padding:2px 8px; background:transparent; border-color:transparent; color:var(--muted)}
+
+#labels{position:fixed; inset:0; pointer-events:none; z-index:1; transition:opacity .35s ease; overflow:hidden}
+.flabel{position:absolute; left:0; top:0; display:flex; align-items:center; gap:6px; white-space:nowrap;
+  font-size:12px; font-weight:700; padding:3px 8px 3px 6px; border-radius:3px; background:#ffffffe6; border:1px solid var(--line); color:var(--text)}
+.flabel i{width:8px; height:8px; border-radius:2px; display:block}
+.flabel.dir{font-weight:400; color:var(--muted); background:#ffffffd0}
+.flabel.lm{font-weight:400; font-size:11px; color:#46525c; background:#ffffffd8; border-style:dashed}
+.flabel.trk{font-family:var(--f-mono); font-weight:500; font-size:11px; padding:1px 6px; color:#fff; background:#2a3946; border-color:#2a3946}
+
+#compass{position:fixed; z-index:2; right:332px; bottom:24px; width:54px; height:54px; pointer-events:none}
+#compass svg{width:100%; height:100%}
+
+#tip{position:fixed; z-index:3; pointer-events:none; padding:5px 9px; border-radius:3px; background:#1b2227; color:#fff; font-size:12px; white-space:nowrap; transform:translate(14px,14px)}
+#err{position:fixed; inset:0; display:grid; place-items:center; padding:24px; text-align:center; color:var(--muted)}
+
+@media (max-width:720px){
+  #titleblock{left:16px; top:calc(env(safe-area-inset-top,0px) + 14px)}
+  h1{font-size:21px}
+  .note{display:none}
+  #panel{top:auto; left:0; right:0; bottom:0; width:auto; max-height:42%; border-radius:10px 10px 0 0; border-left:0; border-right:0; border-bottom:0; padding-bottom:env(safe-area-inset-bottom,0px)}
+  .hint{display:none}
+  #panel{transition:transform .28s ease}
+  #panel.dragging{transition:none}
+  body.sheet-min #panel{transform:translateY(calc(100% - 44px - env(safe-area-inset-bottom,0px)))}
+  #grab{display:flex; flex-direction:column; align-items:center; gap:5px; flex:none; width:100%; height:44px; padding:8px 0 0; border:0; border-bottom:1px solid var(--line); border-radius:0; background:transparent; color:var(--muted); font-size:11.5px; touch-action:none; cursor:grab}
+  #grab::before{content:""; width:40px; height:4px; border-radius:2px; background:#aeb7be}
+  #compass{right:16px; bottom:calc(42% + 12px); transition:bottom .28s ease}
+  body.sheet-min #compass{bottom:calc(44px + env(safe-area-inset-bottom,0px) + 12px)}
+  #card{left:16px; bottom:auto; top:calc(env(safe-area-inset-top,0px) + 112px); width:calc(100vw - 32px)}
+  .flabel{font-size:11px}
+}
+@media (prefers-reduced-motion:reduce){ .hud, #labels{transition:none} }
+</style>
+
+<div id="stage" aria-label="名鉄 太田川駅の3Dモデル。ドラッグで回転、ホイールでズーム。"></div>
+<div id="labels" aria-hidden="true"></div>
+
+<header id="titleblock" class="hud">
+  <div class="eyebrow">Meitetsu Ōtagawa Sta. · TA09 · 3-level viaduct</div>
+  <h1>太田川駅<small>名鉄常滑線・河和線 / 愛知県東海市</small></h1>
+  <div class="facts">
+    <span>高架開業 <b>2011.12.17</b></span>
+    <span>ホーム <b>3面6線</b>(2階 4線・3階 2線)</span>
+    <span>乗降 <b>20,284</b> 人/日(2024年度)</span>
+  </div>
+  <div class="note">国土地理院の空中写真と建物データ、OpenStreetMap の線路・ホーム、名鉄の配線図をもとに実寸(m)で組んだ再現模型です。周辺1 km四方の建物は実際の輪郭です。駅の階高・内部の部屋割り、周辺建物の高さは推定を含みます。</div>
+</header>
+
+<div id="compass" class="hud" aria-hidden="true"><svg viewBox="-27 -27 54 54"><circle r="25" fill="#ffffffcc" stroke="#cdd4da"/><g id="needle"><path d="M0,-19 L5,0 L-5,0Z" fill="#c23039"/><path d="M0,19 L5,0 L-5,0Z" fill="#9aa4ad"/><text x="0" y="-20.5" font-size="7" text-anchor="middle" fill="#1b2227" font-family="IBM Plex Mono, monospace">N</text></g></svg></div>
+
+<aside id="panel" class="hud" aria-label="操作パネル">
+  <button id="grab" aria-expanded="true" aria-controls="panel"><span id="grabTxt">下へスワイプで隠す</span></button>
+  <div class="pscroll">
+    <button id="tour" aria-pressed="false">▶ デモ再生</button>
+    <div class="btnrow3" role="group" aria-label="視点">
+      <button id="vCover">断面ビュー</button>
+      <button id="vExplode">分解ビュー</button>
+      <button id="vEast">東口から</button>
+    </div>
+    <section class="group">
+      <div class="eyebrow">Section</div>
+      <div class="ctl">
+        <div class="ctl-head"><label for="cut">断面の位置</label><output id="cutOut"></output></div>
+        <input type="range" id="cut" min="0" max="100" step="1" value="74">
+      </div>
+      <div class="seg" role="group" aria-label="切る範囲">
+        <button id="modeBldg" aria-pressed="true">駅舎だけ切る</button>
+        <button id="modeAll" aria-pressed="false">全体を切る</button>
+      </div>
+    </section>
+    <section class="group">
+      <div class="eyebrow">Explode</div>
+      <div class="ctl">
+        <div class="ctl-head"><label for="explode">階の分解</label><output id="exOut">0%</output></div>
+        <input type="range" id="explode" min="0" max="100" step="1" value="0">
+      </div>
+    </section>
+    <section class="group">
+      <div class="eyebrow">View</div>
+      <div class="checks">
+        <label class="check"><input type="checkbox" id="shell" checked> 外壁・屋根</label>
+        <label class="check"><input type="checkbox" id="city" checked> 周辺の街</label>
+        <label class="check"><input type="checkbox" id="photo" checked> 航空写真</label>
+        <label class="check"><input type="checkbox" id="trains" checked> 列車</label>
+        <label class="check"><input type="checkbox" id="lbl" checked> ラベル</label>
+        <label class="check"><input type="checkbox" id="trk" checked> 番線</label>
+      </div>
+    </section>
+    <section class="group">
+      <div class="eyebrow">Floors &amp; Parts</div>
+      <ul id="partlist"></ul>
+    </section>
+  </div>
+  <div class="hint">ドラッグで回転・右ドラッグで移動・ホイールでズーム。階や部位をクリックすると単独表示。<br><kbd>H</kbd> UIを隠す　<kbd>E</kbd> 分解　<kbd>Esc</kbd> 選択解除</div>
+  <div class="credit">出典: 国土地理院(空中写真・基盤地図情報の建物)、© OpenStreetMap contributors、Wikipedia「太田川駅」配線略図</div>
+</aside>
+
+<section id="card" class="hud" hidden aria-live="polite">
+  <button class="close" id="cardClose" aria-label="選択を解除">×</button>
+  <div class="lv" id="cLv"></div>
+  <h2 id="cName"></h2>
+  <p id="cDesc"></p>
+  <dl id="cSpecs"></dl>
+</section>
+<div id="tip" hidden></div>
+
+<!-- three.js r128 と地物データを同梱(オフラインの会場でも動くように) -->
+<script src="vendor/three.min.js"></script>
+<script src="vendor/OrbitControls.js"></script>
+<script src="otagawa-data.js"></script>
+<script src="otagawa-ground.js"></script>
+<script>
+(function(){
+const $ = id => document.getElementById(id);
+
+/* phones: the control panel is a bottom sheet; swipe it down (or tap the grabber) to leave only a 44 px tab */
+(function sheet(){
+  const panel = $('panel'), grab = $('grab'), scroller = panel.querySelector('.pscroll'), phone = matchMedia('(max-width:720px)');
+  const setMin = min => { document.body.classList.toggle('sheet-min', min); grab.setAttribute('aria-expanded', !min);
+    $('grabTxt').textContent = min ? 'メニューを開く' : '下へスワイプで隠す'; };
+  let y0 = null, dy = 0, fromGrab = false, wasMin = false;
+  const start = (y, g) => { y0 = y; dy = 0; fromGrab = g; wasMin = document.body.classList.contains('sheet-min'); };
+  const move = y => {
+    if (y0 === null) return false;
+    dy = y - y0;
+    if (!fromGrab && (wasMin || dy < 0)) return false;          // the panel body only swipes down, and only from its top
+    const h = panel.offsetHeight - 44, off = Math.max(0, Math.min(h, (wasMin ? h : 0) + dy));
+    if (Math.abs(dy) > 6){ panel.classList.add('dragging'); panel.style.transform = `translateY(${off}px)`; return true; }
+    return false;
+  };
+  const end = () => {
+    if (y0 === null) return; y0 = null;
+    const dragged = panel.classList.contains('dragging');
+    panel.classList.remove('dragging'); panel.style.transform = '';
+    if (dragged && Math.abs(dy) > 40) setMin(dy > 0);
+    else if (fromGrab && Math.abs(dy) < 6) setMin(!wasMin);   // tap on the grabber toggles
+  };
+  grab.addEventListener('pointerdown', e => { if (!phone.matches) return; grab.setPointerCapture(e.pointerId); start(e.clientY, true); });
+  grab.addEventListener('pointermove', e => move(e.clientY));
+  grab.addEventListener('pointerup', end); grab.addEventListener('pointercancel', end);
+  panel.addEventListener('touchstart', e => {
+    if (!phone.matches || grab.contains(e.target) || e.target.closest('input[type=range]') || scroller.scrollTop > 0) return;
+    start(e.touches[0].clientY, false);
+  }, {passive:true});
+  panel.addEventListener('touchmove', e => { if (move(e.touches[0].clientY) && e.cancelable) e.preventDefault(); }, {passive:false});
+  panel.addEventListener('touchend', end); panel.addEventListener('touchcancel', end);
+  phone.addEventListener('change', () => { if (!phone.matches) setMin(false); });
+})();
+const fail = msg => document.body.insertAdjacentHTML('beforeend', `<div id="err">${msg}</div>`);
+if (!window.THREE || !THREE.OrbitControls) { fail('3Dライブラリを読み込めませんでした。ファイル一式(vendor フォルダ)がそろっているか確認してください。'); return; }
+const DATA = window.OTAGAWA_DATA;
+if (!DATA) { fail('地物データ(otagawa-data.js)を読み込めませんでした。'); return; }
+
+/* URL options (for still renders): ?view=cover|explode|east &mode=all &ui=0 &labels=0 &bg=ffffff &t=12 (freeze trains)
+   &cut=31 &nocut=1 &photo=0 &cam=px,py,pz,tx,ty,tz */
+const Q = new URLSearchParams(location.search);
+const BG = '#' + (Q.get('bg') || 'eef1f3').replace(/[^0-9a-f]/gi,'');
+document.documentElement.style.setProperty('--bg', BG);
+if (Q.get('ui') === '0') document.body.classList.add('clean');
+
+let renderer;
+try { renderer = new THREE.WebGLRenderer({antialias:true, preserveDrawingBuffer:Q.has('t')}); } catch(e){ fail('このブラウザでは WebGL を使えないため、3D表示ができません。'); return; }
+
+/* Frame: metres. x = across the tracks (+ = east side), z = along the tracks (+ = south, toward 常滑/河和), y = up.
+   The track axis runs 24.2° east of true north. Origin = midway between the two 2F main tracks, at the middle of the platforms. */
+const NORTH_DEG = DATA.frame.bearing, EXT = DATA.frame.ext;
+const stage = $('stage');
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 0.62;
+renderer.localClippingEnabled = true;
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.setClearColor(new THREE.Color(BG), 1);
+stage.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.fog = new THREE.Fog(new THREE.Color(BG), 520, 1150);
+const camera = new THREE.PerspectiveCamera(30, 1, 1, 3000);
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true; controls.dampingFactor = 0.08; controls.minDistance = 12; controls.maxDistance = 900;
+controls.maxPolarAngle = Math.PI * 0.485;
+const sph = (az, el, r, t) => new THREE.Vector3(t.x + r*Math.cos(el)*Math.sin(az), t.y + r*Math.sin(el), t.z + r*Math.cos(el)*Math.cos(az));
+function resize(){ const w = stage.clientWidth, h = stage.clientHeight; renderer.setSize(w, h, false); camera.aspect = w/h; camera.updateProjectionMatrix(); }
+new ResizeObserver(resize).observe(stage); resize();
+
+/* sky environment for believable glass and metal */
+(function(){
+  const pm = new THREE.PMREMGenerator(renderer);
+  const env = new THREE.Scene();
+  const sg = new THREE.SphereGeometry(100, 32, 16), cols = [];
+  const p = sg.attributes.position;
+  for (let i=0;i<p.count;i++){ const y = p.getY(i)/100; const c = y > 0 ? new THREE.Color(0xdfeaf5).lerp(new THREE.Color(0x8fb5dd), Math.pow(y,0.6)) : new THREE.Color(0xd9dcd8).lerp(new THREE.Color(0x7a8078), Math.min(1,-y*2)); cols.push(c.r,c.g,c.b); }
+  sg.setAttribute('color', new THREE.Float32BufferAttribute(cols,3));
+  env.add(new THREE.Mesh(sg, new THREE.MeshBasicMaterial({vertexColors:true, side:THREE.BackSide})));
+  const sunDisc = new THREE.Mesh(new THREE.SphereGeometry(8,16,8), new THREE.MeshBasicMaterial({color:new THREE.Color(1,0.97,0.9).multiplyScalar(3)})); sunDisc.position.set(55,70,45); env.add(sunDisc);
+  scene.environment = pm.fromScene(env, 0.02).texture; pm.dispose();
+})();
+scene.add(new THREE.HemisphereLight(0xe6eefc, 0x8f887c, 0.32));
+const sun = new THREE.DirectionalLight(0xfff1dc, 2.1);
+sun.position.set(-120, 150, 95); sun.castShadow = true;
+sun.shadow.mapSize.set(4096, 4096);
+Object.assign(sun.shadow.camera, {left:-230, right:230, top:300, bottom:-300, near:20, far:700});
+sun.shadow.camera.updateProjectionMatrix();
+sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.4;
+scene.add(sun, sun.target);
+const fillL = new THREE.DirectionalLight(0xdfe8ff, 0.22); fillL.position.set(-120, 80, -60); scene.add(fillL);
+
+/* ---------- levels (m, estimated from photos) ---------- */
+const R2 = 8.5, P2 = 9.6, D2B = 6.9;          // 2F rail top / platform top / deck soffit
+const MZ = 14.8;                               // mezzanine floor
+const R3 = 19.5, P3 = 20.6, D3B = 17.6;        // 3F rail top / platform top / deck soffit
+const ROOF_E = 19.8, ROOF_W = 29.6;            // roofs of the east (2F) block and the west (3F) block
+/* plan (m): station roofs from the 基盤地図情報 footprints, platforms from OSM */
+const XW = -16.8, XE = 16.6, XM = 1.0;         // west wall / east wall / line between the 3F block and the 2F block
+const ZE0 = -56, ZE1 = 75, ZW0 = -46, ZW1 = 66; // ends of the east block and of the west (3F) block
+const PZ0 = -83, PZ1 = 83;                     // platform ends (≈166 m)
+const BLD = {z0:ZE0, z1:ZE1};
+
+/* ---------- section: two planes; only their intersection is removed ---------- */
+const cutA = new THREE.Plane(new THREE.Vector3(0,0,-1), 31);   // removes z > cut
+const cutB = new THREE.Plane(new THREE.Vector3(0,0, 1), -(PZ1+3));  // removes z < PZ1+3 (building mode: the station and its platforms)
+const clip = [cutA, cutB];
+
+const EX = {city:0, structure:0, conc:9, vertical:0, f2:22, mezz:33, f3:44, shell:0, trains:0};
+const parts = {}, order = [];
+function part(key, info){
+  const g = new THREE.Group(); g.userData.part = key; scene.add(g);
+  parts[key] = Object.assign({key, group:g, mats:[], lines:[], clipped:true, exY:EX[key] || 0, pieces:[]}, info);
+  order.push(key); return g;
+}
+function M(key, color, o={}){
+  const m = new THREE.MeshStandardMaterial(Object.assign({color, roughness:.8, metalness:0, envMapIntensity:.32}, o));
+  if (parts[key].clipped) { m.clippingPlanes = clip; m.clipIntersection = true; m.clipShadows = true; }
+  if (m.transparent) m.userData.glass = m.opacity;
+  parts[key].mats.push(m); return m;
+}
+const lineMats = {};
+function edgeMat(key){
+  if (!lineMats[key]){ const m = new THREE.LineBasicMaterial({color:0x26313b, transparent:true, opacity:.16}); if (parts[key].clipped){ m.clippingPlanes = clip; m.clipIntersection = true; } parts[key].lines.push(m); m.userData.base = .16; lineMats[key] = m; }
+  return lineMats[key];
+}
+function addTo(key, obj, parent){ (parent || parts[key].group).add(obj); return obj; }
+function box(key, mat, x0,x1, y0,y1, z0,z1, opts={}){
+  const g = new THREE.BoxGeometry(Math.abs(x1-x0), Math.abs(y1-y0), Math.abs(z1-z0));
+  const m = new THREE.Mesh(g, mat); m.position.set((x0+x1)/2, (y0+y1)/2, (z0+z1)/2);
+  m.castShadow = !mat.transparent; m.receiveShadow = true;
+  if (opts.edges && !mat.transparent) m.add(new THREE.LineSegments(new THREE.EdgesGeometry(g), edgeMat(key)));
+  return addTo(key, m, opts.parent);
+}
+/* piece = a sub-group that rises with its own floor when exploded */
+function piece(key, exY){ const g = new THREE.Group(); g.userData.exY = exY; parts[key].group.add(g); parts[key].pieces.push(g); return g; }
+const V3 = THREE.Vector3;
+
+/* ---------- canvas textures ---------- */
+function canvasTex(w, h, draw, rx=1, ry=1){
+  const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h);
+  const t = new THREE.CanvasTexture(c); t.encoding = THREE.sRGBEncoding; t.anisotropy = 8;
+  t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(rx, ry); return t;
+}
+// curtain wall: one 1.5 m module per texture repeat; transom at ~30 %
+const glassTexBase = (ctx, w, h) => {
+  ctx.clearRect(0,0,w,h);
+  const g = ctx.createLinearGradient(0,0,0,h); g.addColorStop(0,'rgba(70,92,110,0.62)'); g.addColorStop(1,'rgba(40,56,70,0.5)');
+  ctx.fillStyle = g; ctx.fillRect(0,0,w,h);
+  ctx.fillStyle = 'rgba(212,218,223,1)';
+  ctx.fillRect(0,0,5,h); ctx.fillRect(w-5,0,5,h); ctx.fillRect(0,0,w,8); ctx.fillRect(0,h-8,w,8); ctx.fillRect(0,h*0.32,w,5);
+};
+function glassMat(key, len){
+  const t = canvasTex(64, 256, glassTexBase, Math.max(1, Math.round(len/1.5)), 1);
+  const m = M(key, 0xffffff, {map:t, transparent:true, roughness:.08, metalness:.55, envMapIntensity:1.6, side:THREE.DoubleSide, depthWrite:false});
+  m.userData.glass = 1; return m;
+}
+function plane(key, mat, w, h, pos, rotY, parent){ const m = new THREE.Mesh(new THREE.PlaneGeometry(w,h), mat); m.position.copy(pos); m.rotation.y = rotY; m.receiveShadow = true; return addTo(key, m, parent); }
+
+/* ---------- polygon helpers (rings are flat [x0,z0,x1,z1,...]) ---------- */
+const toV2 = r => { const o = []; for (let i=0;i<r.length;i+=2) o.push(new THREE.Vector2(r[i], r[i+1])); if (o.length > 1 && o[0].equals(o[o.length-1])) o.pop(); return o; };
+const area2 = pts => { let a = 0; for (let i=0;i<pts.length;i++){ const p = pts[i], q = pts[(i+1)%pts.length]; a += p.x*q.y - q.x*p.y; } return a/2; };
+function inRing(r, x, z){ let c = false; for (let i=0, j=r.length-2; i<r.length; j=i, i+=2){ const xi=r[i], zi=r[i+1], xj=r[j], zj=r[j+1]; if ((zi>z) !== (zj>z) && x < (xj-xi)*(z-zi)/(zj-zi)+xi) c = !c; } return c; }
+const inPoly = (pl, x, z) => inRing(pl.p, x, z) && !(pl.holes || []).some(h => inRing(h, x, z));
+const inRoad = (x, z) => DATA.roads.some(pl => inPoly(pl, x, z));
+
+/* merged prism builder: walls + roof of many footprints in one geometry (vertex colours) */
+function Prisms(){ this.pos = []; this.nor = []; this.col = []; this.uv = []; }
+const UV0 = [[0.02,0.02],[0.03,0.02],[0.02,0.03]];          // roofs sample a plain corner of the facade texture
+Prisms.prototype.tri = function(a, b, c, col, uvs){
+  const ab = new V3().subVectors(b, a), ac = new V3().subVectors(c, a), n = ab.cross(ac).normalize();
+  [a,b,c].forEach((v, i) => { this.pos.push(v.x, v.y, v.z); this.nor.push(n.x, n.y, n.z); this.col.push(col.r, col.g, col.b); const u = (uvs || UV0)[i]; this.uv.push(u[0], u[1]); });
+};
+Prisms.prototype.add = function(ring, holes, y0, y1, wallCol, roofCol, hip){
+  let pts = toV2(ring); if (pts.length < 3) return;
+  if (area2(pts) < 0) pts.reverse();                       // CCW in (x,z)
+  const hs = (holes || []).map(h => { const p = toV2(h); if (area2(p) > 0) p.reverse(); return p; });
+  // facade uv: one window bay (3 m) per u, one storey (3.2 m) per v
+  const wall = (loop) => { let acc = 0; for (let i=0;i<loop.length;i++){ const p = loop[i], q = loop[(i+1)%loop.length], L = p.distanceTo(q);
+    const a = new V3(p.x,y0,p.y), b = new V3(q.x,y0,q.y), c = new V3(q.x,y1,q.y), d = new V3(p.x,y1,p.y);
+    const u0 = acc/3, u1 = (acc+L)/3, v0 = y0/3.2, v1 = y1/3.2; acc += L;
+    this.tri(a, c, b, wallCol, [[u0,v0],[u1,v1],[u1,v0]]); this.tri(a, d, c, wallCol, [[u0,v0],[u0,v1],[u1,v1]]); } };
+  wall(pts); hs.forEach(wall);
+  if (hip){
+    let cx = 0, cz = 0; pts.forEach(p => { cx += p.x; cz += p.y; }); cx /= pts.length; cz /= pts.length;
+    const apex = new V3(cx, y1 + hip, cz);
+    for (let i=0;i<pts.length;i++){ const p = pts[i], q = pts[(i+1)%pts.length]; this.tri(new V3(p.x,y1,p.y), apex, new V3(q.x,y1,q.y), roofCol); }
+    return;
+  }
+  const tris = THREE.ShapeUtils.triangulateShape(pts, hs), all = pts.concat(...hs);
+  tris.forEach(t => this.tri(new V3(all[t[0]].x,y1,all[t[0]].y), new V3(all[t[2]].x,y1,all[t[2]].y), new V3(all[t[1]].x,y1,all[t[1]].y), roofCol));
+};
+Prisms.prototype.geometry = function(){
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(this.pos, 3));
+  g.setAttribute('normal', new THREE.Float32BufferAttribute(this.nor, 3));
+  g.setAttribute('color', new THREE.Float32BufferAttribute(this.col, 3));
+  g.setAttribute('uv', new THREE.Float32BufferAttribute(this.uv, 2));
+  return g;
+};
+function flatMesh(key, mat, polys, y){
+  const shapes = polys.map(pl => { const s = new THREE.Shape(toV2(pl.p).map(v => new THREE.Vector2(v.x, -v.y))); (pl.holes || []).forEach(h => s.holes.push(new THREE.Path(toV2(h).map(v => new THREE.Vector2(v.x, -v.y))))); return s; });
+  const m = new THREE.Mesh(new THREE.ShapeGeometry(shapes), mat); m.rotation.x = -Math.PI/2; m.position.y = y; m.receiveShadow = true; m.userData.noPick = true;
+  return addTo(key, m);
+}
+
+/* ====================================================================================== */
+/*  CITY: aerial photo, real building footprints (国土地理院), roads (OSM)                  */
+/* ====================================================================================== */
+part('city', {clipped:false, dot:'#9aa1a7', lv:'GL', name:'駅前広場と周辺の街',
+  desc:'建物の輪郭は国土地理院の基盤地図情報(1/2500)そのもので、駅から約500 m の範囲の約1,200棟を置いた。駅前広場とロータリーは舗装・縁石・植栽帯・路面表示を立体化し、駅を中心に東西南北約270 mの地面は模型調の舗装・道路で統一し、その外側には国土地理院の空中写真を使用。広場の細部寸法・什器配置は写真に基づく推定。高さは、ユウナル東海の住宅棟ローレルタワー太田川駅前(16階・約57 m)など公表されている建物以外は、建物の種別と空中写真の影の長さから推定した。',
+  specs:[['東口','駅前広場・噴水・バスのりば(2012年3月〜)'],['東へ','幅50 mの歩行者専用道路と「どんでん広場」'],['西口','大屋根・ラスパ太田川・ユウナル東海(東海市芸術劇場)'],['データ','国土地理院 空中写真・基盤地図情報/© OpenStreetMap']]});
+const city = parts.city.group;
+const cityBits = {};
+(function buildCity(){
+  const k = 'city';
+  const fade = canvasTex(256, 256, (c,w,h) => { const g = c.createRadialGradient(w/2,h/2,w*0.2,w/2,h/2,w/2); g.addColorStop(0,'#fff'); g.addColorStop(0.78,'#fff'); g.addColorStop(1,'#000'); c.fillStyle = g; c.fillRect(0,0,w,h); });
+  fade.encoding = THREE.LinearEncoding; fade.wrapS = fade.wrapT = THREE.ClampToEdgeWrapping;
+  // aerial photo, already rotated into the model frame by build-otagawa-data.py
+  const photoTex = new THREE.TextureLoader().load(window.OTAGAWA_GROUND, () => { photoMat.needsUpdate = true; });
+  photoTex.encoding = THREE.sRGBEncoding; photoTex.anisotropy = 8;
+  const photoMat = M(k, new THREE.Color(1.9, 1.9, 1.86), {map:photoTex, alphaMap:fade, transparent:true, roughness:1, depthWrite:false});
+  photoMat.userData.glass = 1;
+  const photo = new THREE.Mesh(new THREE.PlaneGeometry(EXT*2, EXT*2), photoMat); photo.rotation.x = -Math.PI/2; photo.position.y = -0.04; photo.receiveShadow = true; photo.renderOrder = -2; photo.userData.noPick = true; city.add(photo);
+  const plainMat = M(k, 0xd2d5ce, {alphaMap:fade, transparent:true, roughness:.95, depthWrite:false}); plainMat.userData.glass = 1;
+  const plain = new THREE.Mesh(new THREE.PlaneGeometry(EXT*2, EXT*2), plainMat); plain.rotation.x = -Math.PI/2; plain.position.y = -0.05; plain.receiveShadow = true; plain.renderOrder = -2; plain.userData.noPick = true; city.add(plain);
+  const po = f => ({roughness:.9, polygonOffset:true, polygonOffsetFactor:f, polygonOffsetUnits:f});
+  const roads = flatMesh(k, M(k, 0xb3b9bd, po(-2)), DATA.roads, 0.02);
+  const water = flatMesh(k, M(k, 0x9fbfd0, Object.assign(po(-3), {roughness:.2})), DATA.water, 0.03);
+  cityBits.photo = [photo]; cityBits.plain = [plain, roads, water];
+
+  const soil = M(k, 0x9a8468, {roughness:1, side:THREE.DoubleSide}), topM = M(k, 0xc3c8bf, {roughness:.95});
+  const slab = new THREE.Mesh(new THREE.BoxGeometry(EXT*1.6, 5, EXT*1.6), [soil, soil, topM, soil, soil, soil]); slab.position.y = -2.56; slab.visible = false; slab.userData.noPick = true; slab.receiveShadow = true; city.add(slab); parts.city.slab = slab;
+
+/* Station forecourts, traced in model metres from the bundled GSI aerial.
+   Surface boundaries and street furniture are illustrative, not survey geometry.
+   All foreground surfaces are geometry/materials; no aerial photograph is used as their texture. */
+function buildForecourts(){
+  const k='city', group=new THREE.Group(); group.name='station-forecourts'; city.add(group);
+  const mat=(color)=>M(k,color,{roughness:.94});
+  const paving=mat(0xd2cbbc), asphalt=mat(0x72777a), curb=mat(0xe3dfd4);
+  const grass=mat(0x879a70), soil=mat(0x75664f), white=mat(0xf3f0e6);
+  const steel=mat(0x626b70), wood=mat(0x947b59), tactile=mat(0xd6b46a);
+  const surface=(name,p,m,y=.1,holes=[])=>{
+    const mesh=flatMesh(k,m,[{p,holes}],y);
+    group.attach(mesh); mesh.name=name; return mesh;
+  };
+  const prism=(name,p,holes,y0,y1,m)=>{
+    const b=new Prisms(), col=new THREE.Color(0xffffff);
+    b.add(p,holes,y0,y1,col,col,0);
+    const mesh=new THREE.Mesh(b.geometry(),m);
+    mesh.name=name; mesh.castShadow=true; mesh.receiveShadow=true; group.add(mesh); return mesh;
+  };
+  const line=(pts,width,m,y=.13)=>{
+    for(let i=0;i<pts.length-2;i+=2){
+      const x=pts[i],z=pts[i+1],dx=pts[i+2]-x,dz=pts[i+3]-z,L=Math.hypot(dx,dz);
+      const mesh=new THREE.Mesh(new THREE.BoxGeometry(width,.025,L),m);
+      mesh.position.set(x+dx/2,y,z+dz/2); mesh.rotation.y=Math.atan2(dx,dz);
+      mesh.receiveShadow=true; group.add(mesh);
+    }
+  };
+  // Northern approach and the building-side passages visible in the cover.
+  // Plan geometry uses the existing road dataset; surface detail remains illustrative.
+  const northBounds={xmin:17,xmax:180,zmin:-145,zmax:12};
+  const clipGround=(ring,bounds)=>{
+    let pts=toV2(ring).map(p=>[p.x,p.y]);
+    for(const [axis,limit,sign] of [[0,bounds.xmin,1],[0,bounds.xmax,-1],[1,bounds.zmin,1],[1,bounds.zmax,-1]]){
+      const output=[];
+      for(let i=0;i<pts.length;i++){
+        const a=pts[i],b=pts[(i+1)%pts.length];
+        const insideA=(a[axis]-limit)*sign>=0,insideB=(b[axis]-limit)*sign>=0;
+        if(insideA)output.push(a);
+        if(insideA!==insideB){
+          const t=(limit-a[axis])/(b[axis]-a[axis]);
+          output.push([a[0]+t*(b[0]-a[0]),a[1]+t*(b[1]-a[1])]);
+        }
+      }
+      pts=output;
+      if(pts.length<3)return [];
+    }
+    return pts.flat();
+  };
+  const clipNorth=ring=>clipGround(ring,northBounds);
+  // Equal coverage around the station centre (x=0, z=10), including the west exit.
+  // The photograph remains outside this square; nearby ground is opaque geometry.
+  const stationBounds={xmin:-270,xmax:270,zmin:-260,zmax:280};
+  const stationGround=mat(0xc8c6be), groundJoint=mat(0xbfbdB6);
+  prism('station-neighbourhood-ground',[-270,-260,270,-260,270,280,-270,280],[],-.025,.005,stationGround);
+  for(let x=-270;x<=270;x+=10)line([x,-260,x,280],.045,groundJoint,.008);
+  for(let z=-260;z<=280;z+=10)line([-270,z,270,z],.045,groundJoint,.008);
+  for(const [polygons,material,name,y] of [
+    [DATA.roads,asphalt,'station-neighbourhood-road',.04],
+    [DATA.water,mat(0x9fbfd0),'station-neighbourhood-water',.045]
+  ]){
+    for(const polygon of polygons){
+      const ring=clipGround(polygon.p,stationBounds);
+      if(ring.length<6)continue;
+      const holes=(polygon.holes||[]).map(h=>clipGround(h,stationBounds)).filter(h=>h.length>=6);
+      surface(name,ring,material,y,holes);
+    }
+  }
+  window.__stationGroundBounds={...stationBounds,center:{x:0,z:10},extent:270,photoTextures:0};
+  const northPaving=mat(0xc8c6be);
+  prism('north-approach-ground',[17,-145,180,-145,180,12,17,12],[],.025,.095,northPaving);
+  const northJoint=mat(0xb6b5ae);
+  for(let x=18;x<=180;x+=4)line([x,-145,x,12],.055,northJoint,.11);
+  for(let z=-144;z<=12;z+=4)line([17,z,180,z],.055,northJoint,.11);
+  // Road surfaces cover the paving joints and follow the original road polygons.
+  for(const road of DATA.roads){
+    const ring=clipNorth(road.p);
+    if(ring.length<6)continue;
+    const holes=(road.holes||[]).map(clipNorth).filter(h=>h.length>=6);
+    surface('north-road-surface',ring,asphalt,.145,holes);
+  }
+  // Station-side pedestrian strip with a raised edge; joins existing entrance paving.
+  prism('north-station-walk',[17,-115,22,-115,22,-5,28,0,58,0,58,3,17,3],[],.10,.20,paving);
+  line([21,-112,21,-6,27,1,57,1],.18,curb,.23);
+
+  // East entrance + 50m promenade; keep surrounding building footprints clear.
+  const east=[17,-3,58,0,65,12,83,12,83,8,264,8,264,59,172,59,172,54,89,54,82,48,65,43,17,43];
+  prism('east-plaza-paving',east,[],.03,.14,paving);
+  const promenade=[86,12,260,12,260,55,86,55];
+  surface('promenade-paving',promenade,paving,.15);
+  // Paving joints are procedural lines, not a photograph.
+  const joints=mat(0xbeb7aa);
+  for(let x=20;x<264;x+=4){
+    const start=x<66?3:13,end=x<66?41:54;
+    line([x,start,x,end],.065,joints,.165);
+  }
+  for(let z=16;z<=52;z+=4)line([86,z,260,z],.065,joints,.17);
+  for(let z=7;z<=39;z+=4)line([18,z,61,z],.065,joints,.17);
+  // Broad walking axis and tactile guidance from entrance to promenade / bus stops.
+  surface('central-walkway',[86,29,260,29,260,40,86,40],mat(0xe0d9c9),.18);
+  line([18,35,68,35],.55,tactile,.20);
+  line([89,35,260,35],.55,tactile,.21);
+  line([26,35,26,49,20,49,20,105],.55,tactile,.21);
+  // Raised tree beds under existing rows of trees.
+  for(const z of [17,26,43,52]){
+    for(let x=89;x<=164;x+=15){
+      prism('promenade-planter',[x-4,z-1.5,x+4,z-1.5,x+4,z+1.5,x-4,z+1.5],[],.17,.36,curb);
+      surface('planter-soil',[x-3.7,z-1.2,x+3.7,z-1.2,x+3.7,z+1.2,x-3.7,z+1.2],soil,.38);
+    }
+  }
+  // East rotary: GSI aerial plan + Kotobuki station-front installation photos.
+  // https://townscape.kotobuki.co.jp/works/place/station-front/057.html
+  // Dimensions remain photo-derived estimates. Preserve the surveyed canopy outline.
+  const rounded=(ring,passes=2)=>{
+    let pts=toV2(ring).map(v=>[v.x,v.y]);
+    for(let n=0;n<passes;n++){
+      const out=[];
+      pts.forEach((p,i)=>{const q=pts[(i+1)%pts.length];out.push([.75*p[0]+.25*q[0],.75*p[1]+.25*q[1]],[.25*p[0]+.75*q[0],.25*p[1]+.75*q[1]]);});pts=out;
+    }return pts.flat();
+  };
+  const outer=rounded([18,45,28,36,41,34,54,34,70,41,76,62,86,87,86,108,79,124,65,132,17,132,16,118,18,90]);
+  prism('rotary-sidewalk',outer,[],.025,.16,paving);
+  const road=rounded([23,47,31,41,42,39,53,39,66,45,72,64,82,88,82,106,75,120,64,128,21,128,20,117,22,90]);
+  surface('rotary-asphalt',road,asphalt,.18);
+  // Island is primarily a paved taxi holding area with narrow planted edges, not a lawn.
+  const island=rounded([29,58,34,51,44,48,54,51,59,64,65,81,73,98,69,107,61,109,51,101,40,89,30,77]);
+  prism('central-island-curb',island,[],.18,.34,curb);
+  surface('central-island-planting',rounded([30,59,35,52,44,49,53,52,58,65,64,81,72,98,68,106,61,108,52,100,41,88,31,76]),mat(0xb3ae8b),.36);
+  const taxiBay=rounded([31,66,44,53,53,56,68,93,68,102,62,105,36,80],1);
+  surface('taxi-holding-bay',taxiBay,asphalt,.39);
+  // Diagonal marked bays with a clear circulation lane and no trees in the parking surface.
+  for(let i=0;i<9;i++){
+    const x=33+i*2.5,z=65+i*3.5;
+    line([x,z,x+8,z-7],.11,white,.415);
+  }
+  line([33,65,53,93],.12,white,.415);
+  line([41,58,61,86],.12,white,.415);
+  const circle=(cx,cz,r,n=64)=>Array.from({length:n},(_,i)=>[cx+Math.cos(i/n*Math.PI*2)*r,cz+Math.sin(i/n*Math.PI*2)*r]).flat();
+  prism('south-rotary-island-curb',circle(36,111,9),[],.18,.34,curb);
+  surface('south-rotary-garden',circle(36,111,8.5),soil,.36);
+  surface('south-island-inner-stone',circle(36,111,5.6),paving,.38);
+  // Smooth white edge lines and separate boarding strips underneath the shelter.
+  line([...road,road[0],road[1]],.12,white,.215);
+  for(const z of [57,78,98]){
+    surface('bus-boarding-paving',[18,z,21,z,20,z+13,17,z+13],mat(0xd0a363),.23);
+    line([24,z,27,z,27,z+12,24,z+12],.12,white,.225);
+  }
+  for(let i=0;i<6;i++)surface('entry-zebra-'+i,[23,44+i*1.05,32,44+i*1.05,32,44.6+i*1.05,23,44.6+i*1.05],white,.23);
+  for(let i=0;i<7;i++)surface('rotary-zebra-'+i,[56+i*1.1,119,56.65+i*1.1,119,56.65+i*1.1,128,56+i*1.1,128],white,.23);
+  for(const [x,z,a] of [[24,110,Math.PI],[75,91,0],[58,124,-Math.PI/2]]){
+    const arrow=[-.35,-2,.35,-2,.35,.2,1,.2,0,2,-1,.2,-.35,.2],p=[];
+    for(let i=0;i<arrow.length;i+=2)p.push(x+arrow[i]*Math.cos(a)+arrow[i+1]*Math.sin(a),z-arrow[i]*Math.sin(a)+arrow[i+1]*Math.cos(a));
+    surface('traffic-direction',p,white,.24);
+  }
+  // Shelter perimeter beams and fine transverse roof seams on the existing footprint.
+  const shelter=DATA.canopies.find(c=>c.p.length>70 && c.h===4.4 && c.p[0]>0);
+  if(shelter){
+    line(shelter.p,.10,steel,4.18);
+    const pts=toV2(shelter.p);
+    for(let i=0;i<pts.length-1;i++){
+      const a=pts[i],b=pts[i+1],L=a.distanceTo(b);
+      if(L<9)continue;
+      for(let d=2;d<L;d+=2){const t=d/L,x=a.x+(b.x-a.x)*t,z=a.y+(b.y-a.y)*t;
+        // Narrow fascia divisions, no opaque extra roof over the translucent shell.
+        box(k,steel,x-.035,x+.035,4.16,4.42,z-.035,z+.035,{parent:group});
+      }
+    }
+  }
+  // Boarding-stop posts with small white signs and sheltered benches.
+  for(const z of [60,81,101]){
+    box(k,steel,18.9,19.0,.2,2.9,z-.05,z+.05,{parent:group});
+    box(k,curb,18.75,19.15,2.2,2.85,z-.30,z+.30,{parent:group});
+    box(k,wood,17.2,18.0,.48,.64,z+2,z+4.5,{parent:group});
+    for(const dz of [2.2,4.3])box(k,steel,17.45,17.65,.16,.48,z+dz-.06,z+dz+.06,{parent:group});
+  }
+  // West public forecourt and the east-west pedestrian connection below the existing canopy.
+  const west=[-124,-53,-25,-45,-18,-34,-18,28,-39,30,-39,21,-124,13];
+  prism('west-plaza-paving',west,[],.03,.14,paving);
+  for(let x=-120;x<-20;x+=5)line([x,-39,x,12],.065,joints,.17);
+  for(let z=-35;z<=10;z+=5)line([-120,z,-20,z],.065,joints,.17);
+  line([-122,2,-20,10],.55,tactile,.20);
+  // Benches, slim lighting columns and bollards at pedestrian edges.
+  const bench=(x,z)=>{
+    box(k,wood,x-1.4,x+1.4,.5,.66,z-.4,z+.4,{parent:group});
+    for(const dx of [-1,1])box(k,steel,x+dx-.07,x+dx+.07,.16,.5,z-.28,z+.28,{parent:group});
+  };
+  for(const x of [96,126,156,186,216,246]){bench(x,11);bench(x,57);}
+  for(const x of [-105,-78,-50])bench(x,13);
+  const poleG=new THREE.CylinderGeometry(.09,.12,5.5,8), lampG=new THREE.BoxGeometry(1.1,.16,.45);
+  for(const [x,z] of [[28,42],[64,45],[79,112],[28,129],[95,9],[135,9],[175,9],[215,9],[255,9],[-110,12],[-65,16]]){
+    const pole=new THREE.Mesh(poleG,steel);pole.position.set(x,2.9,z);pole.castShadow=true;group.add(pole);
+    const lamp=new THREE.Mesh(lampG,curb);lamp.position.set(x+.35,5.7,z);group.add(lamp);
+  }
+  const bollardG=new THREE.CylinderGeometry(.12,.12,.8,8);
+  // Follow the same curved edge as the asphalt, offset onto the sidewalk.
+  // Keep the entrance zebra crossing clear; a fixed z previously put poles in traffic.
+  const roadEdge=toV2(road);
+  let edgeDistance=0,nextBollard=0;
+  for(let i=0;i<roadEdge.length;i++){
+    const a=roadEdge[i],c=roadEdge[(i+1)%roadEdge.length];
+    const dx=c.x-a.x,dz=c.y-a.y,length=Math.hypot(dx,dz);
+    if(length<1e-6)continue;
+    while(nextBollard<=edgeDistance+length){
+      const t=(nextBollard-edgeDistance)/length;
+      const x=a.x+dx*t,z=a.y+dz*t;
+      if(x>=33 && x<=71 && z<=53){
+        const b=new THREE.Mesh(bollardG,steel);
+        b.name='rotary-sidewalk-bollard';
+        b.position.set(x+.45*dz/length,.56,z-.45*dx/length);
+        b.castShadow=true;group.add(b);
+      }
+      nextBollard+=3;
+    }
+    edgeDistance+=length;
+  }
+  window.__forecourtStats={objects:group.children.length,photoTextures:0};
+}
+buildForecourts();
+
+  // buildings: one merged mesh. Walls white-ish, roofs a shade darker; houses get a low hipped roof.
+  const P = new Prisms(), PF = new Prisms(), hash = i => ((i*2654435761) >>> 0) / 4294967296;
+  const walls = [0xf2f1ec, 0xe9e7e0, 0xe2e3e1, 0xeeebe4, 0xdfe2e3].map(c => new THREE.Color(c));
+  const roofsH = [0x6e7377, 0x7b7672, 0x86796d, 0x5f6a74, 0x8c8e8f].map(c => new THREE.Color(c));
+  const roofF = new THREE.Color(0xc9cccd), roofT = new THREE.Color(0xb7bcc0);
+  DATA.buildings.forEach((b, i) => {
+    const w = walls[Math.floor(hash(i)*walls.length)];
+    if (b.k === 'h'){
+      const pts = toV2(b.p); let a = Math.abs(area2(pts));
+      const hip = a < 220 ? Math.min(2.2, 0.55*Math.sqrt(a)/2.4) : 0;
+      P.add(b.p, b.holes, 0, b.h - (hip ? 0 : 0), w, roofsH[Math.floor(hash(i+7)*roofsH.length)], hip);
+    } else {
+      (b.h > 7.5 ? PF : P).add(b.p, b.holes, 0, b.h, w, b.k === 't' ? roofT : roofF, 0);
+    }
+  });
+  // window bands for the taller buildings: a plain corner (roofs) + one storey of wall with a window strip
+  const facade = canvasTex(64, 64, (c,w,h) => { c.fillStyle = '#fff'; c.fillRect(0,0,w,h); c.fillStyle = '#9aa6af'; c.fillRect(5, 12, 54, 24); c.fillStyle = '#b8c1c8'; c.fillRect(5, 12, 54, 3); c.fillStyle = '#fff'; c.fillRect(30, 12, 3, 24); c.fillStyle = '#e7e9ea'; c.fillRect(0, 40, w, 3); });
+  facade.wrapS = facade.wrapT = THREE.RepeatWrapping;
+  [[P, null], [PF, facade]].forEach(([pp, map]) => {
+    const bg = pp.geometry();
+    const bm = new THREE.Mesh(bg, M(k, 0xffffff, Object.assign({vertexColors:true, roughness:.8}, map ? {map} : {})));
+    bm.castShadow = bm.receiveShadow = true; city.add(bm);
+    city.add(new THREE.LineSegments(new THREE.EdgesGeometry(bg, 35), edgeMat(k)));
+  });
+  // ローレルタワー太田川駅前: ユウナル東海の住宅棟(地上16階・約57 m、6〜16階が住宅106戸)。
+  // 敷地南側に東西に長い板状棟で、南面に住戸ごとのバルコニー(空中写真の南面に12区画)、東端もバルコニーが回り込む。
+  // 北面は共用廊下、黒い塔屋が屋上から突き出す(西松建設の竣工写真・空中写真から)。
+  (function buildLaurel(){
+    // 低層部(基盤地図情報の輪郭)の西辺と南辺は線路の軸から約4.7°振れているので、タワーはその南西の角を原点に
+    // 南辺に沿わせた局所座標で組む: x = 南辺に沿って東へ、z = 南辺から外(南)へ。西端・南のバルコニー先端・東のバルコニー先端を低層部の辺にそろえる
+    const SW = [-122.3, 115.5], SE = [-39.2, 122.4], L = Math.hypot(SE[0]-SW[0], SE[1]-SW[1]);
+    const g = new THREE.Group(); g.position.set(SW[0], 0, SW[1]); g.rotation.y = -Math.atan2(SE[1]-SW[1], SE[0]-SW[0]); city.add(g);
+    const BAL = 2.0, X0 = 0, X1 = L - BAL, ZS = -BAL, ZN = ZS - 13;   // balcony depth, body
+    const F6 = 22.0, FH = 3.15, NF = 11, TOP = F6 + FH*NF;        // 6F floor, storey height, 11 residential floors (6F-16F)
+    const BAYS = 12, BW = (X1 - X0) / BAYS;
+    const mWall = M(k, 0xf1f1ee, {roughness:.75}), mSlab = M(k, 0xfafaf8, {roughness:.7}), mDark = M(k, 0x30363b, {roughness:.45, metalness:.2});
+    const mRail = M(k, 0xd5dee4, {transparent:true, opacity:.6, roughness:.15, metalness:.1});
+    const winTex = (bays, floors, door) => canvasTex(128, 64, (c,w,h) => {
+      c.fillStyle = '#eceeec'; c.fillRect(0,0,w,h);
+      const g = c.createLinearGradient(0,0,0,h); g.addColorStop(0,'#55636e'); g.addColorStop(1,'#738592'); c.fillStyle = g;
+      if (door){ c.fillRect(8, 6, w-16, h-14); c.fillStyle = '#d9dee1'; c.fillRect(w/2-1, 6, 3, h-14); }
+      else { c.fillRect(30, 14, w-60, h-30); }
+    }, bays, floors);
+    const face = (tex, w, pos, rotY) => plane(k, M(k, 0xffffff, {map:tex, roughness:.5}), w, FH*NF, pos, rotY, g);
+    const yMid = F6 + FH*NF/2;
+    box(k, mWall, X0, X1, 20, TOP, ZN, ZS, {edges:true, parent:g});
+    face(winTex(BAYS, NF, true), X1 - X0, new V3((X0+X1)/2, yMid, ZS + 0.03), 0);              // south: sliding doors behind the balconies
+    face(winTex(2, NF, true), ZS - ZN, new V3(X1 + 0.03, yMid, (ZN+ZS)/2), Math.PI/2);        // east end
+    face(winTex(2, NF, false), ZS - ZN, new V3(X0 - 0.03, yMid, (ZN+ZS)/2), -Math.PI/2);      // west end
+    face(winTex(BAYS*2, NF, false), X1 - X0, new V3((X0+X1)/2, yMid, ZN - 0.03), Math.PI);     // north: corridor doors and windows
+    for (let i = 0; i <= NF; i++){
+      const y = F6 + i*FH, roof = i === NF;
+      // south and east balconies: slab + frosted glass rail (the roof gets a deeper eave instead of a rail)
+      box(k, mSlab, X0, X1 + BAL, y - (roof ? 0.6 : 0.15), y + 0.12, ZS, ZS + BAL, {edges:true, parent:g});
+      box(k, mSlab, X1, X1 + BAL, y - (roof ? 0.6 : 0.15), y + 0.12, ZN + 1, ZS, {edges:true, parent:g});
+      if (!roof){
+        box(k, mRail, X0, X1 + BAL, y + 0.12, y + 1.15, ZS + BAL - 0.08, ZS + BAL, {parent:g});
+        box(k, mRail, X1 + BAL - 0.08, X1 + BAL, y + 0.12, y + 1.15, ZN + 1, ZS + BAL, {parent:g});
+        // north: open corridor = slab + solid parapet
+        box(k, mSlab, X0 + 2, X1 - 2, y - 0.15, y + 1.2, ZN - 1.8, ZN - 1.55, {edges:true, parent:g});
+        box(k, mSlab, X0 + 2, X1 - 2, y - 0.15, y + 0.05, ZN - 1.8, ZN, {parent:g});
+      }
+    }
+    for (let j = 0; j <= BAYS; j++)                                   // partitions between the dwellings' balconies
+      box(k, mSlab, X0 + j*BW - 0.12, X0 + j*BW + 0.12, F6, TOP, ZS, ZS + BAL, {parent:g});
+    box(k, mSlab, X0, X1, TOP, TOP + 0.9, ZN, ZS, {edges:true, parent:g});                  // roof parapet
+    box(k, mDark, 58, 65, 20, TOP + 6.3, ZN - 1.9, ZN + 7, {edges:true, parent:g});        // stair/lift core and the 2-storey penthouse
+  })();
+  // roofs without walls (bus shelters, the west plaza's big roof, carports, parking decks): a slab on posts
+  const C = new Prisms(), cCol = new THREE.Color(0xf3f4f4), pCol = new THREE.Color(0x8a939b);
+  DATA.canopies.forEach(c => {
+    const big = c.h >= 6;
+    C.add(c.p, null, c.h - (big ? 0.6 : 0.25), c.h, cCol, cCol, 0);
+    if (big && c.h < 8) C.add(c.p, null, 2.7, 3.2, cCol, cCol, 0);      // parking decks: one more level
+    const pts = toV2(c.p); let acc = 0;
+    for (let i=0;i<pts.length;i++){ const p = pts[i], q = pts[(i+1)%pts.length], L = p.distanceTo(q);
+      for (let s = (acc ? 7 - acc : 0); s < L; s += 7){ const t = s/L, x = p.x + (q.x-p.x)*t, z = p.y + (q.y-p.y)*t;
+        const cx = x + (Math.sign(-x)||1)*0, r = big ? 0.3 : 0.12; C.add([cx-r,z-r, cx+r,z-r, cx+r,z+r, cx-r,z+r], null, 0, c.h - 0.3, pCol, pCol, 0); }
+      acc = (acc + L) % 7; }
+  });
+  const cm = new THREE.Mesh(C.geometry(), M(k, 0xffffff, {vertexColors:true, roughness:.6, side:THREE.DoubleSide})); cm.castShadow = cm.receiveShadow = true; city.add(cm);
+
+  // 東口: fountain in front of the east exit, its granite spheres
+  const mStone = M(k, 0xbdb8ae, {roughness:.7}), mWater = M(k, 0x9cc4d8, {roughness:.05, metalness:.2}), mJet = M(k, 0xe9f4fa, {transparent:true, opacity:.55, roughness:.1});
+  const FX = 78, FZ = 35;
+  { const b = new THREE.Mesh(new THREE.CylinderGeometry(6.5, 6.8, 0.3, 48), mStone); b.position.set(FX, 0.15, FZ); city.add(b);
+    const w = new THREE.Mesh(new THREE.CylinderGeometry(5.9, 5.9, 0.08, 48), mWater); w.position.set(FX, 0.3, FZ); city.add(w);
+    for (let i=0;i<20;i++){ const a = i/20*Math.PI*2, j = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.1, 1.2+(i%3)*0.35, 6), mJet); j.position.set(FX+Math.cos(a)*3.6, 0.9, FZ+Math.sin(a)*3.6); city.add(j); }
+    for (let i=0;i<8;i++){ const a = i/8*Math.PI*2+0.2, s = new THREE.Mesh(new THREE.SphereGeometry(0.5, 14, 10), mStone); s.position.set(FX+Math.cos(a)*8.6, 0.5, FZ+Math.sin(a)*8.6); city.add(s); }
+  }
+  // trees, positions read off the aerial photo: planters in front of the east exit, the double rows of zelkovas
+  // along the 50 m promenade, the lighter rows beside どんでん広場, and the island of the bus loop
+  const treeSpots = [];
+  for (let x = 24; x <= 72; x += 6.5){ treeSpots.push([x, 15, .55], [x, 21, .55]); if (x < 52) treeSpots.push([x, 27, .5]); }
+  [17, 26, 43, 52].forEach(z => { for (let x = 86; x <= 166; x += 6.8) treeSpots.push([x, z, 1]); });
+  [19, 47].forEach(z => { for (let x = 174; x <= 256; x += 8) treeSpots.push([x, z, .75]); });
+  [[34,57],[43,51],[54,62],[61,79],[69,98],[36,111],[92,57],[96,64]].forEach(p => treeSpots.push([p[0], p[1], .9]));
+  const mTrunk = M(k, 0x7d6a58), leafCols = [0x7fa275, 0x8bb07c, 0x6e9467];
+  const trunkG = new THREE.CylinderGeometry(0.16, 0.26, 3.0, 6).translate(0, 1.5, 0), leafG = new THREE.IcosahedronGeometry(2.6, 1);
+  const trunks = new THREE.InstancedMesh(trunkG, mTrunk, treeSpots.length), leaves = new THREE.InstancedMesh(leafG, M(k, 0xffffff, {roughness:.9, flatShading:true}), treeSpots.length);
+  { const mm = new THREE.Matrix4(), q = new THREE.Quaternion(), sc = new V3(), ps = new V3(), yAx = new V3(0,1,0);
+    treeSpots.forEach(([x,z,s0],i) => { const s = s0 * (0.85 + ((i*37)%10)/40); mm.compose(ps.set(x,0,z), q.identity(), sc.set(s,s,s)); trunks.setMatrixAt(i, mm);
+      mm.compose(ps.set(x, 4.6*s, z), q.setFromAxisAngle(yAx, i), sc.set(s, s*1.15, s)); leaves.setMatrixAt(i, mm); leaves.setColorAt(i, new THREE.Color(leafCols[i%3])); }); }
+  trunks.castShadow = leaves.castShadow = true; city.add(trunks, leaves);
+  // buses and taxis in the east terminal (positions read off the photo)
+  const mBus = M(k, 0xf3f5f6, {roughness:.4}), mBusB = M(k, 0xc8202f, {roughness:.5}), mBusW = M(k, 0x2b3842, {roughness:.2, metalness:.3}), mTaxi = M(k, 0x3b3f6e, {roughness:.4});
+  const tire=M(k,0x25282a),glass=M(k,0x465b63,{roughness:.25}),body=M(k,0xf5f3ee);
+  const wheel=(g,x,z,r)=>{const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,.22,12),tire);m.rotation.z=Math.PI/2;m.position.set(x,r+.12,z);g.add(m);};
+  const bus=(x,z,rot)=>{
+    const g=new THREE.Group();
+    box(k,mBus,-1.2,1.2,.55,3.05,-5.2,5.2,{parent:g});
+    box(k,mBusB,-1.22,1.22,.95,1.35,-5.1,5.1,{parent:g});
+    for(const side of [-1,1]){
+      for(let i=0;i<6;i++)box(k,mBusW,side*1.21-.02,side*1.21+.02,1.75,2.75,-4.8+i*1.6,-3.4+i*1.6,{parent:g});
+      wheel(g,side*1.15,-3.3,.5);wheel(g,side*1.15,3.3,.5);
+    }
+    box(k,glass,-1.05,1.05,1.7,2.8,-5.23,-5.19,{parent:g});
+    g.position.set(x,0,z);g.rotation.y=rot;city.add(g);
+  };
+  bus(23.5,63,.05);bus(23.0,83,.02);
+  for(let i=0;i<5;i++){
+    const g=new THREE.Group(),paint=i%2?body:mTaxi;
+    box(k,paint,-.86,.86,.45,1.03,-2.25,2.25,{parent:g});
+    box(k,glass,-.72,.72,1.03,1.55,-1.05,1.05,{parent:g});
+    box(k,paint,-.70,.70,1.55,1.62,-.8,.85,{parent:g});
+    box(k,body,-.18,.18,1.62,1.80,-.1,.18,{parent:g});
+    for(const x of [-.84,.84])for(const z of [-1.45,1.45])wheel(g,x,z,.30);
+    g.position.set(37.0+i*2.5,0,63.5+i*3.5);g.rotation.y=-Math.PI/4;city.add(g);
+  }
+
+})();
+
+/* ====================================================================================== */
+/*  TRACK PLAN — alignments from OpenStreetMap (projected into the model frame),            */
+/*  numbering from the station track diagram: 2F = 1・2(down) + 3・4(up), 2 and 3 are the  */
+/*  mains; 3F = 5・6 for 河和線 up trains, which fly over the 2F mains south of the station. */
+/* ====================================================================================== */
+const KD_S = 170, KU_S = 159;                       // where the 河和線 down / up lines leave the station zone
+function prof(name){
+  // returns y(x, z, s) where s = arc length (m) from the path's first point
+  if (name === 'kd') return (x,z,s,sk) => z < KD_S ? R2 : Math.max(0.6, R2 - Math.max(0, sk - 40) * 8.5/620);
+  if (name === 'f3') return (x,z,s,sk) => {
+    if (z < -110) return Math.max(R2, R3 - (-110 - z) * 11/300);   // drops back to the 2F level north of the station (≈37‰)
+    if (z > KU_S) return Math.max(1.0, R3 - Math.max(0, sk - 10) * 0.028);   // climbs from the 河和線 (≈28‰)
+    return R3;
+  };
+  if (name === 'f3s') return () => R3;
+  return () => R2;
+}
+const TRK = {
+  //            [x, z] north → south
+  up:  {lv:'f2', pf:'2', pts:[[-1.0,-520],[-1.5,-374],[-1.7,-242],[-2.2,-184],[-2.8,-150],[-2.8,150],[-2.6,200],[-2.5,300],[-2.4,520]]},
+  dn:  {lv:'f2', pf:'2', pts:[[4.3,-520],[4.3,-337],[4.4,-284],[3.7,-242],[3.4,-184],[3.0,-150],[3.0,150],[2.9,200],[2.6,249],[2.5,300],[2.0,420],[1.6,520]]},
+  t1:  {lv:'f2', pf:'kd', pts:[[3.4,-163],[5.6,-143],[10.5,-110],[13.4,-86],[14.0,-66],[14.0,32],[13.8,48],[12.6,66],[10.4,88],[7.5,118],[7.6,170],[8.9,186],[10.8,202],[13.3,218],[17.1,235],[21.7,251],[28.4,268],[33.7,281],[40.7,295],[52.4,315],[71.8,344],[108.8,397],[221.2,560]]},
+  t4:  {lv:'f2', pf:'2', pts:[[-2.7,-165],[-6.0,-130],[-9.8,-102],[-12.0,-84],[-13.2,-64],[-13.2,44],[-12.8,58],[-11.6,72],[-9.6,90],[-6.0,122],[-2.6,159]]},
+  y1:  {lv:'f2', pf:'2', pts:[[2.5,268],[4.8,285],[6.7,300],[6.8,327],[6.3,420],[5.9,500]], stopEnd:true},
+  y2:  {lv:'f2', pf:'2', pts:[[6.7,300],[8.4,311],[10.0,327],[10.0,368],[9.6,500]], stopEnd:true},
+  xn1: {lv:'f2', pf:'2', pts:[[-1.7,-242],[0.8,-214],[3.4,-184]]},
+  xn2: {lv:'f2', pf:'2', pts:[[3.7,-242],[0.8,-214],[-2.2,-184]]},
+  xs1: {lv:'f2', pf:'2', pts:[[3.0,200],[0.1,225],[-2.5,248]]},
+  xs2: {lv:'f2', pf:'2', pts:[[-2.6,200],[0.1,225],[2.6,249]]},
+  xk1: {lv:'f2', pf:'2', pts:[[7.5,118],[5.2,144],[3.1,170]]},
+  xk2: {lv:'f2', pf:'2', pts:[[2.9,118],[5.2,144],[7.6,170]]},
+  t5:  {lv:'f3', pf:'f3', pts:[[-6.2,-520],[-7.2,-383],[-7.9,-242],[-7.0,-168],[-4.4,-100],[-3.4,-86],[-2.9,-71],[-2.8,-40],[-2.8,140],[-2.6,159],[-1.0,180],[0.8,195],[3.1,213],[6.5,230],[11.5,247],[17.2,262],[25.0,280],[34.3,298],[45.9,316],[104.1,401],[216,566]]},
+  t6:  {lv:'f3', pf:'f3s', pts:[[-7.0,-168],[-8.7,-138],[-10.4,-110],[-12.2,-86],[-13.2,-66],[-13.2,44],[-12.8,58],[-11.6,72],[-9.6,90],[-6.0,122],[-2.6,159]]},
+};
+/* dense samples: {x,y,z,s,tx,tz} every 1 m; lookups by z (every path runs north → south) */
+const PATH = {};
+Object.entries(TRK).forEach(([key, t]) => {
+  const cv2 = new THREE.CatmullRomCurve3(t.pts.map(p => new V3(p[0], 0, p[1])), false, 'centripetal', 0.5);
+  const L = cv2.getLength(), n = Math.max(4, Math.ceil(L)), f = prof(t.pf), smp = [];
+  let sk0 = null;
+  for (let i=0;i<=n;i++){ const p = cv2.getPointAt(i/n), s = i/n*L;
+    if (sk0 === null && ((t.pf === 'kd' && p.z >= KD_S) || (t.pf === 'f3' && p.z >= KU_S))) sk0 = s;
+    smp.push({x:p.x, z:p.z, s, y:f(p.x, p.z, s, sk0 === null ? 0 : s - sk0)}); }
+  // gentle vertical curves: smooth y
+  for (let pass=0; pass<6; pass++) for (let i=1;i<smp.length-1;i++) smp[i].y = (smp[i-1].y + 2*smp[i].y + smp[i+1].y)/4;
+  const cv = new THREE.CatmullRomCurve3(smp.filter((_,i) => i % 3 === 0 || i === smp.length-1).map(p => new V3(p.x, p.y, p.z)), false, 'centripetal', 0.5);
+  PATH[key] = {key, cv, smp, L:cv.getLength(), lv:t.lv, t};
+});
+function xAt(key, z){ const s = PATH[key].smp; if (z < s[0].z - 0.01 || z > s[s.length-1].z + 0.01) return null;
+  let lo = 0, hi = s.length-1; while (hi - lo > 1){ const m = (lo+hi) >> 1; if (s[m].z < z) lo = m; else hi = m; }
+  const a = s[lo], b = s[hi], u = b.z === a.z ? 0 : (z - a.z)/(b.z - a.z); return {x:a.x + (b.x-a.x)*u, y:a.y + (b.y-a.y)*u}; }
+/* station zones: inside them a single wide deck carries all tracks of that level */
+const Z2 = {z0:-170, z1:166}, Z3 = {z0:-168, z1:159};
+function zoneX(level, z){
+  const keys = level === 'f2' ? ['up','dn','t1','t4'] : ['t5','t6'];
+  let lo = 1e9, hi = -1e9; keys.forEach(k => { const r = xAt(k, z); if (r){ lo = Math.min(lo, r.x); hi = Math.max(hi, r.x); } });
+  if (level === 'f2' && z > 118 && z < 172){ const r = xAt('t1', z); if (r) hi = Math.max(hi, r.x); }
+  return [lo, hi];
+}
+const in2 = p => p.z > Z2.z0 && p.z < Z2.z1 && Math.abs(p.y - R2) < 0.05;
+const in3 = p => p.z > Z3.z0 && p.z < Z3.z1 && Math.abs(p.y - R3) < 0.05;
+
+/* sweep a rectangular section along a curve: lateral a0..a1, vertical b0..b1 relative to the curve (uv: u = metres along) */
+function sweepGeo(cv, a0,a1, b0,b1, seg=2, uScale=1){
+  const L = cv.getLength(), n = Math.max(2, Math.ceil(L/seg));
+  const prof = [[a0,b0],[a1,b0],[a1,b1],[a0,b1]], pos = [], uv = [], idx = [];
+  for (let i=0;i<=n;i++){
+    const u = i/n, p = cv.getPointAt(u), t = cv.getTangentAt(u), sx = t.z, sz = -t.x, l = Math.hypot(sx,sz) || 1;
+    prof.forEach(([a,b], j) => { pos.push(p.x + sx/l*a, p.y + b, p.z + sz/l*a); uv.push(u*L*uScale, j === 0 || j === 3 ? 0 : 1); });
+  }
+  // Outward winding: the top faces up, the bottom faces down.
+  // Inward faces exposed the bed underside coplanar with the deck, causing z-fighting.
+  for (let i=0;i<n;i++) for (let j=0;j<4;j++){ const A=i*4+j, B=i*4+(j+1)%4, C=A+4, D=B+4; idx.push(A,B,C, B,D,C); }
+  const e = n*4; idx.push(0,2,1, 0,3,2, e,e+1,e+2, e,e+2,e+3);
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos,3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(uv,2)); g.setIndex(idx); g.computeVertexNormals(); return g;
+}
+function sweep(key, cv, mat, a0,a1,b0,b1, parent, uScale){ const m = new THREE.Mesh(sweepGeo(cv,a0,a1,b0,b1,2,uScale), mat); m.castShadow = m.receiveShadow = true; return addTo(key, m, parent); }
+const curve = pts => new THREE.CatmullRomCurve3(pts.map(p => new V3(p[0], p[1], p[2])), false, 'centripetal', 0.5);
+/* contiguous pieces of a path where pred(sample) holds */
+function runs(key, pred, step=2){
+  const s = PATH[key].smp, out = []; let cur = null;
+  for (let i=0;i<s.length;i+=step){ const p = s[i]; if (pred(p)) (cur || (cur = [])).push([p.x, p.y, p.z]); else if (cur){ if (cur.length > 2) out.push(curve(cur)); cur = null; } }
+  if (cur && cur.length > 2) out.push(curve(cur));
+  return out;
+}
+
+/* ====================================================================================== */
+/*  VIADUCT STRUCTURE (piers)                                                              */
+/* ====================================================================================== */
+part('structure', {dot:'#cfd4d8', lv:'構造', name:'高架橋(連続立体交差)',
+  desc:'愛知県が事業主体の連続立体交差事業で、常滑線・河和線の約2.7 kmを高架にした。駅南側にあった「開かずの踏切」太田川1号踏切を含め、6か所の踏切がなくなった。河和線の上り線は南東から2階の本線をまたいで3階へ上がり、駅の北で2階の高さへ下りて上り本線に合流する。',
+  specs:[['高架区間','約2.7 km(常滑線 約2.0 km・河和線 約0.7 km)'],['除却した踏切','6か所'],['工事期間','2003年3月〜2011年12月'],['線形','OpenStreetMap の線路データを投影']]});
+const connectors = [];
+function connect(obj, botLayer, botY, topLayer, topY){ connectors.push({obj, botLayer, botY, topLayer, topY}); return obj; }
+const pierG = new THREE.BoxGeometry(1,1,1).translate(0,0.5,0);
+const colG  = new THREE.CylinderGeometry(0.5,0.5,1,20).translate(0,0.5,0);
+{
+  const k = 'structure', mP = M(k, 0xd4d7d9, {roughness:.85}), mC = M(k, 0xe4dfd5, {roughness:.6});
+  const pier = (geo, mat, x, z, sx, sz, bot, botY, top, topY, rot=0) => { const p = new THREE.Mesh(geo, mat); p.position.set(x, 0, z); p.scale.set(sx, 1, sz); p.rotation.y = rot; parts[k].group.add(p); connect(p, bot, botY, top, topY); return p; };
+  const placed = [];
+  const free = (x, z, r) => !placed.some(q => Math.hypot(q[0]-x, q[1]-z) < r);
+  // station: rigid frames every 10 m — outside track 4, under island 3・4, between the mains, under island 1・2, outside track 1
+  for (let z = -80; z <= 80; z += 10) [-15.6, -8.0, 0.1, 8.5, 15.4].forEach(x => {
+    const inside = z > ZE0 && z < ZE1;
+    pier(pierG, inside ? mC : mP, x, z, 1.2, 1.2, 'city', 0, 'f2', D2B); placed.push([x, z]);
+  });
+  // beyond the station zone: one pier under each 2F track every 14 m (skipping roads), sharing piers between close tracks
+  ['up','dn','t1','t4','y1','y2'].forEach(key => {
+    const s = PATH[key].smp;
+    for (let i=0;i<s.length;i+=14){ const p = s[i];
+      if (Math.abs(p.x) > EXT || Math.abs(p.z) > EXT - 10 || inRoad(p.x, p.z) || !free(p.x, p.z, 5)) continue;
+      if (p.z > -92 && p.z < 92) continue;
+      const dir = Math.atan2(s[Math.min(s.length-1,i+1)].x - p.x, s[Math.min(s.length-1,i+1)].z - p.z);
+      pier(pierG, mP, p.x, p.z, 1.6, 1.6, 'city', 0, 'f2', p.y - 1.9, dir); placed.push([p.x, p.z]);
+    }
+  });
+  // 3F: columns standing on the 2F deck (outside track 4, on island 3・4, between the mains)
+  for (let z = -80; z <= 80; z += 10){
+    pier(pierG, mP, -15.6, z, 1.0, 1.0, 'f2', R2 - 0.5, 'f3', D3B);
+    pier(colG,  mP, -8.0, z, 0.9, 0.9, 'f2', P2, 'f3', D3B);
+    pier(pierG, mP, 0.1, z, 0.9, 0.9, 'f2', R2 - 0.5, 'f3', D3B);
+  }
+  // 3F line outside the station: tall piers from the ground; where it crosses the 2F tracks, a portal frame
+  const mBeam = M(k, 0xcfd3d6, {roughness:.85});
+  const s3 = PATH.t5.smp;
+  for (let i=0;i<s3.length;i+=13){ const p = s3[i];
+    if ((p.z > -92 && p.z < 165) || Math.abs(p.z) > EXT - 10 || p.y < 2.5) continue;
+    const occ = ['up','dn','t1','t4','y1','y2','xs1','xs2','xk1','xk2'].map(kk => xAt(kk, p.z)).filter(r => r && Math.abs(r.y - R2) < 1.2 && Math.abs(r.x - p.x) < 9);
+    if (!occ.length){ if (!inRoad(p.x, p.z)) pier(pierG, mP, p.x, p.z, 1.8, 1.8, 'city', 0, 'f3', p.y - 1.9); continue; }
+    if (p.y - R2 < 8.6) continue;                      // too low to clear the 2F overhead wires: carried by the 2F deck
+    const xs = occ.map(r => r.x).concat([p.x]);
+    const x0 = Math.min(...xs) - 4.2, x1 = Math.max(...xs) + 4.2;
+    [x0, x1].forEach(x => { if (!inRoad(x, p.z)) pier(pierG, mP, x, p.z, 1.4, 1.4, 'city', 0, 'f3', p.y - 1.9); });
+    const beam = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0 + 1.4, 1.4, 1.6), mBeam); beam.position.set((x0+x1)/2, p.y - 2.6, p.z); beam.castShadow = true; parts[k].group.add(beam);
+    connect(beam, 'f3', p.y - 2.6 - 0.7, 'f3', p.y - 2.6 + 0.7); beam.userData.fixedH = true;
+  }
+}
+
+/* ---------- track & platform builders ---------- */
+const sleeperTex = canvasTex(64, 64, (c,w,h) => { c.fillStyle = '#9b958c'; c.fillRect(0,0,w,h); for (let i=0;i<220;i++){ c.fillStyle = `rgba(${60+Math.random()*80|0},${60+Math.random()*70|0},${55+Math.random()*60|0},.35)`; c.fillRect(Math.random()*w, Math.random()*h, 2, 2); } c.fillStyle = '#c9c6c0'; c.fillRect(18, 4, 28, h-8); }, 1, 1);
+sleeperTex.wrapS = THREE.RepeatWrapping; sleeperTex.wrapT = THREE.ClampToEdgeWrapping; sleeperTex.rotation = Math.PI/2;
+const mTrack = {};
+function TM(k){ return mTrack[k] || (mTrack[k] = {deck:M(k, 0xd9dcde, {roughness:.85, side:THREE.DoubleSide}), slab:M(k, 0xffffff, {map:sleeperTex, roughness:.95}), rail:M(k, 0x80868c, {metalness:.7, roughness:.35}), par:M(k, 0xe3e6e8, {roughness:.8, side:THREE.DoubleSide})}); }
+/* deck + parapets for a track outside its station zone; a parapet only where no other track runs alongside */
+function trackDeck(k, key, inZone, others){
+  const T = TM(k);
+  runs(key, p => !inZone(p) && Math.abs(p.z) < EXT).forEach(c => sweep(k, c, T.deck, -2.7, 2.7, -1.9, -0.5));
+  [1, -1].forEach(side => {
+    const clear = p => { const i = PATH[key].smp.indexOf(p), q = PATH[key].smp[Math.min(PATH[key].smp.length-1, i+1)], tx = q.x - p.x, tz = q.z - p.z, l = Math.hypot(tx,tz) || 1;
+      const nx = tz/l*side, nz = -tx/l*side;
+      return !others.some(o => { const r = xAt(o, p.z + nz*4); return r && Math.abs(r.y - p.y) < 1.5 && Math.abs(r.x - (p.x + nx*4)) < 3.4; }); };
+    runs(key, p => !inZone(p) && Math.abs(p.z) < EXT && clear(p), 1).forEach(c => sweep(k, c, T.par, side > 0 ? -2.7 : 2.45, side > 0 ? -2.45 : 2.7, -0.5, 0.95));
+  });
+}
+function trackOn(k, key, inZone){
+  const T = TM(k);
+  runs(key, p => Math.abs(p.z) < EXT, 1).forEach(c => {
+    sweep(k, c, T.slab, -1.3, 1.3, -0.5, -0.17, null, 1/0.6);
+    sweep(k, c, T.rail, 0.5, 0.57, -0.17, 0); sweep(k, c, T.rail, -0.57, -0.5, -0.17, 0);
+  });
+}
+/* wide deck slab between the outermost tracks of a level, built as an extruded outline */
+function zoneSlab(k, level, z0, z1, y0, y1, xFix){
+  const L = [], Rr = [];
+  for (let z = z0; z <= z1; z += 2){ let [lo, hi] = zoneX(level, z); if (xFix) [lo, hi] = xFix(z, lo, hi); L.push([lo - 2.7, z]); Rr.push([hi + 2.7, z]); }
+  const pts = L.concat(Rr.reverse());
+  const sh = new THREE.Shape(pts.map(p => new THREE.Vector2(p[0], p[1])));
+  const g = new THREE.ExtrudeGeometry(sh, {depth:y1 - y0, bevelEnabled:false}); g.rotateX(Math.PI/2); g.translate(0, y1, 0);
+  const m = new THREE.Mesh(g, TM(k).deck); m.castShadow = m.receiveShadow = true; addTo(k, m);
+  m.add(new THREE.LineSegments(new THREE.EdgesGeometry(g, 40), edgeMat(k)));
+  return {L, R:Rr.reverse()};
+}
+function parapetAlong(k, pts, y, side){ if (pts.length < 3) return; const c = curve(pts.map(p => [p[0], y, p[1]])); sweep(k, c, TM(k).par, side < 0 ? -0.25 : 0, side < 0 ? 0 : 0.25, 0, 1.45); }
+/* island platform between two tracks (edges 1.5 m from the track centres), tapering where the tracks close in */
+function platform(k, keyW, keyE, top, z0, z1, mTopCol){
+  const T = parts[k]._pl || (parts[k]._pl = {body:M(k, 0xe0e2e3, {roughness:.85}), top:M(k, mTopCol, {roughness:.75}), tac:M(k, 0xf0c02a, {roughness:.7}), edge:M(k, 0xf4f5f5, {roughness:.7})});
+  const W = [], E = [];
+  for (let z = z0; z <= z1 + 1e-6; z += 1){ const a = xAt(keyW, z), b = xAt(keyE, z); if (!a || !b) continue; const xw = a.x + 1.5, xe = b.x - 1.5; if (xe - xw < 2) continue; W.push([xw, z]); E.push([xe, z]); }
+  const outline = W.concat(E.slice().reverse());
+  const sh = new THREE.Shape(outline.map(p => new THREE.Vector2(p[0], p[1])));
+  const mk = (mat, y0, y1, edges) => { const g = new THREE.ExtrudeGeometry(sh, {depth:y1-y0, bevelEnabled:false}); g.rotateX(Math.PI/2); g.translate(0, y1, 0); const m = new THREE.Mesh(g, mat); m.castShadow = m.receiveShadow = true; if (edges) m.add(new THREE.LineSegments(new THREE.EdgesGeometry(g, 40), edgeMat(k))); return addTo(k, m); };
+  mk(T.body, top-1.2, top-0.03, true); mk(T.top, top-0.03, top);
+  // tactile strips and white edge lines follow both edges
+  [[W, 1], [E, -1]].forEach(([edge, s]) => {
+    const line = (off, w, mat) => { const c = curve(edge.map(p => [p[0] + s*off, top, p[1]])); sweep(k, c, mat, -w/2, w/2, 0, 0.02); };
+    line(0.08, 0.16, T.edge); line(0.95, 0.3, T.tac);
+  });
+  return {W, E};
+}
+
+/* ====================================================================================== */
+/*  2F                                                                                     */
+/* ====================================================================================== */
+part('f2', {dot:'#4f7fae', lv:'2F', name:'2階ホーム 1〜4番線',
+  desc:'島式ホーム2面4線。配線図では2番線と3番線がそのまま常滑線の下り・上り本線で、ミュースカイは当駅を最高120 km/hで通過する。1番線は河和線へつながり、4番線は上りの待避線。3・4番線の真上に3階の5・6番線が重なる(3階を支える柱の位置は推定)。',
+  specs:[['1・2番線','下り 常滑線 中部国際空港方面/河和線 河和・内海方面'],['3番線','常滑線 上り 金山・名鉄名古屋方面(常滑方面からの列車)'],['4番線','常滑方面からの列車の待避線'],['ホームの長さ','約166 m(OSM)'],['駅の南','留置線2本']]});
+{
+  const k = 'f2', T = TM(k);
+  const zs = zoneSlab(k, 'f2', Z2.z0, Z2.z1, D2B, R2 - 0.5, (z, lo, hi) => [lo, Math.max(hi, z > ZE0 && z < ZE1 ? XE - 2.7 : hi)].map((v,i) => i === 0 && z > ZE0 && z < ZE1 ? Math.min(v, XW + 2.7) : v));
+  parapetAlong(k, zs.L.filter(p => p[1] < ZE0 - 1 || p[1] > ZE1 + 1 || true), R2 - 0.5, -1);
+  parapetAlong(k, zs.R, R2 - 0.5, 1);
+  const in2z = p => p.z > Z2.z0 + 1 && p.z < Z2.z1 - 1 && Math.abs(p.y - R2) < 0.3;
+  const all2 = ['up','dn','t1','t4','y1','y2'];
+  all2.forEach(key => trackDeck(k, key, in2z, all2.filter(o => o !== key)));
+  ['up','dn','t1','t4','y1','y2','xn1','xn2','xs1','xs2','xk1','xk2'].forEach(key => trackOn(k, key));
+  // buffer stops at the ends of the two sidings
+  const mStop = M(k, 0xd9b31f, {roughness:.6});
+  ['y1','y2'].forEach(key => { const s = PATH[key].smp, p = s[s.length-1]; box(k, mStop, p.x-1.1, p.x+1.1, p.y-0.2, p.y+1.0, p.z-0.4, p.z+0.4); });
+  parts[k].pl12 = platform(k, 'dn', 't1', P2, PZ0, PZ1, 0xa9c2dc);
+  parts[k].pl34 = platform(k, 't4', 'up', P2, PZ0, PZ1, 0xa9c2dc);
+  // canopies over the platform ends outside the building
+  const mCan = M(k, 0xf3f4f5, {roughness:.5, side:THREE.DoubleSide}), mFr = M(k, 0xf7f8f8, {roughness:.5});
+  [[PZ0+2, ZE0], [ZE1, PZ1-2]].forEach(([z0,z1]) => {
+    box(k, mCan, 5.0, 12.0, P2+3.5, P2+3.7, z0, z1, {edges:true});
+    for (let z = z0+2; z < z1; z += 6){ box(k, mFr, 8.35, 8.65, P2, P2+3.5, z-0.15, z+0.15); }
+  });
+  // catenary portals along the 2F tracks
+  const mOH = M(k, 0x9aa3ab, {metalness:.5, roughness:.5});
+  for (let z = -500; z <= 500; z += 50){
+    if (z > PZ0 - 5 && z < PZ1 + 5) continue;
+    const xs = all2.concat(['t5']).map(kk => xAt(kk, z)).filter(r => r && Math.abs(r.y - R2) < 0.5).map(r => r.x);
+    if (!xs.length) continue;
+    const x0 = Math.min(...xs) - 2.9, x1 = Math.max(...xs) + 2.9, yb = R2 - 0.5;
+    box(k, mOH, x0-0.18, x0+0.18, yb, R2+7.6, z-0.18, z+0.18); box(k, mOH, x1-0.18, x1+0.18, yb, R2+7.6, z-0.18, z+0.18); box(k, mOH, x0, x1, R2+7.3, R2+7.65, z-0.18, z+0.18);
+  }
+}
+
+/* ====================================================================================== */
+/*  MEZZANINE                                                                              */
+/* ====================================================================================== */
+part('mezz', {dot:'#8a73b8', lv:'中3F', name:'中3階 連絡通路',
+  desc:'2階ホームと3階ホームのあいだの連絡階。2階の上下本線の上をまたいで1・2番線と3・4番線を結び、さらに上の5・6番線へ通じる。昇降はエレベーターと階段だけで、エスカレーターはない。位置と大きさは推定。',
+  specs:[['昇降手段','エレベーター・階段'],['役割','1・2番線 ⇄ 3・4番線 ⇄ 5・6番線の乗り換え'],['位置','推定']]});
+{
+  const k = 'mezz', mF = M(k, 0xc6b8e2, {roughness:.7}), mS = M(k, 0xe9e6f0), mGl = M(k, 0xb9a9e0, {transparent:true, opacity:.28, roughness:.1, side:THREE.DoubleSide, depthWrite:false});
+  box(k, mS, -10.5, 11.5, MZ-0.6, MZ-0.05, 27.5, 34.5, {edges:true});
+  box(k, mF, -10.5, 11.5, MZ-0.05, MZ, 27.5, 34.5);
+  box(k, mGl, -10.5, 11.5, MZ, MZ+2.4, 27.4, 27.5); box(k, mGl, -10.5, 11.5, MZ, MZ+2.4, 34.5, 34.6);
+}
+
+/* ====================================================================================== */
+/*  3F                                                                                     */
+/* ====================================================================================== */
+part('f3', {dot:'#d4813b', lv:'3F', name:'3階ホーム 5・6番線',
+  desc:'河和線からの上り列車(金山・名鉄名古屋方面)専用の島式ホーム1面2線。地上駅の頃は河和線の上り列車と常滑線の下り列車が駅の南で平面交差していた。河和線の上り線を南東から3階へ上げ、2階の本線をまたがせてこの交差をなくした。駅の北で再び2階の高さへ下り、上り本線に合流する。',
+  specs:[['6番線','河和線からの列車が入線'],['5番線','河和線からの列車の待避線'],['乗り換え','3・4番線と直結するエスカレーターあり'],['ホームの長さ','約166 m(OSM)']]});
+{
+  const k = 'f3', T = TM(k);
+  const zs = zoneSlab(k, 'f3', Z3.z0, Z3.z1, D3B, R3 - 0.5, (z, lo, hi) => [Math.min(lo, z > ZW0 && z < ZW1 ? XW + 2.7 : lo), Math.max(hi, z > -86 && z < 140 ? XM - 2.7 : hi)]);
+  parapetAlong(k, zs.L, R3 - 0.5, -1); parapetAlong(k, zs.R, R3 - 0.5, 1);
+  const in3z = p => p.z > Z3.z0 + 1 && p.z < Z3.z1 - 1 && Math.abs(p.y - R3) < 0.3;
+  trackDeck(k, 't5', in3z, ['t6']); trackDeck(k, 't6', in3z, ['t5']);
+  trackOn(k, 't5'); trackOn(k, 't6');
+  parts[k].pl56 = platform(k, 't6', 't5', P3, PZ0, PZ1, 0xeec29a);
+  const mFr = M(k, 0xf7f8f8, {roughness:.5}), mTop = M(k, 0xe8f0f4, {transparent:true, opacity:.55, roughness:.2, side:THREE.DoubleSide, depthWrite:false});
+  [[PZ0+2, ZW0], [ZW1, PZ1-2]].forEach(([z0,z1]) => {
+    for (let z = z0+2; z < z1; z += 6){ box(k, mFr, -12.6, -3.4, P3+4.2, P3+4.5, z-0.15, z+0.15, {edges:true}); box(k, mFr, -8.15, -7.85, P3, P3+4.3, z-0.15, z+0.15); }
+    box(k, mTop, -12.6, -3.4, P3+4.5, P3+4.6, z0, z1);
+  });
+  // catenary portals on the 3F line outside the station
+  const mOH = M(k, 0x9aa3ab, {metalness:.5, roughness:.5});
+  for (let z = -460; z <= 520; z += 45){
+    if (z > PZ0 - 5 && z < PZ1 + 5) continue;
+    const r = xAt('t5', z); if (!r || r.y < R2 + 1.5 || Math.abs(r.x) > EXT) continue;
+    box(k, mOH, r.x-2.9, r.x-2.55, r.y-0.5, r.y+7.1, z-0.17, z+0.17); box(k, mOH, r.x+2.55, r.x+2.9, r.y-0.5, r.y+7.1, z-0.17, z+0.17); box(k, mOH, r.x-2.9, r.x+2.9, r.y+6.8, r.y+7.15, z-0.17, z+0.17);
+  }
+}
+
+/* ====================================================================================== */
+/*  1F CONCOURSE                                                                           */
+/* ====================================================================================== */
+part('conc', {dot:'#5f9e93', lv:'1F', name:'1階 コンコース',
+  desc:'高架下の1階に駅の設備がまとまっている。東出口(南改札)と西口を結ぶ東西の自由通路があり、北の端には北出口がある。改札を入ると、エスカレーター・階段・エレベーターで2階の各ホームへ上がる。部屋の割り付けは推定。',
+  specs:[['設備','自動券売機・改札口・駅事務所・トイレ(多目的含む)・売店'],['出口','東出口(南改札)・北出口・西口']]});
+{
+  const k = 'conc', mFloor = M(k, 0xd9dcd6, {roughness:.5}), mFree = M(k, 0xcfd8d2, {roughness:.5}), mRoom = M(k, 0xf0f1ef, {roughness:.7}), mGate = M(k, 0x7a8691, {metalness:.3, roughness:.4}), mGateTop = M(k, 0x2d6fb0, {roughness:.4}), mDark = M(k, 0x45525c, {roughness:.4});
+  box(k, mFloor, XW+0.2, XE-0.2, 0, 0.3, ZE0+0.5, ZE1-0.5);
+  box(k, mFree, XW+0.2, XE-0.2, 0.3, 0.32, 21, 34);
+  const gates = (z, x0, n) => { for (let i=0;i<n;i++){ const x = x0 + i*1.6; box(k, mGate, x-0.12, x+0.12, 0.3, 1.35, z-1.2, z+1.2); box(k, mGateTop, x-0.13, x+0.13, 1.35, 1.42, z-1.2, z+1.2); } };
+  gates(19.6, -6, 9); gates(-44, -4, 7);
+  for (let i=0;i<6;i++){ const x = -9 + i*1.4; box(k, mDark, x-0.6, x+0.6, 0.3, 2.0, 33.2, 34); }
+  box(k, mRoom, 10.5, XE-0.2, 0.3, 3.4, 2, 18.5, {edges:true}); box(k, M(k, 0x7b98aa, {transparent:true, opacity:.4}), 10.4, 10.5, 1.2, 2.6, 4, 17);
+  box(k, mRoom, XW+0.2, -12.0, 0.3, 3.4, -36, -18, {edges:true});
+  box(k, mRoom, XW+0.2, -10, 0.3, 3.6, 35, ZE1-0.5, {edges:true});
+  box(k, mRoom, 4, XE-0.2, 0.3, 3.6, 35, ZE1-0.5, {edges:true});
+  box(k, mRoom, -6, 2, 0.3, 3.6, 48, ZE1-0.5, {edges:true});
+  const signTex = canvasTex(512, 64, (c,w,h) => { c.fillStyle = '#20364d'; c.fillRect(0,0,w,h); c.fillStyle = '#fff'; c.font = 'bold 34px "BIZ UDPGothic", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('改札口  のりば  1〜6番線', w/2, h/2+2); });
+  const mSign = M(k, 0xffffff, {map:signTex, roughness:.5});
+  box(k, mSign, -6.5, 8, 3.4, 4.0, 19.45, 19.6); box(k, mSign, -4.5, 7, 3.4, 4.0, -43.85, -43.7);
+}
+
+/* ====================================================================================== */
+/*  STATION SHELL: facades and roofs (each band rises with its floor when exploded)        */
+/* ====================================================================================== */
+part('shell', {dot:'#b8c0c6', lv:'外装', name:'駅舎の外壁・屋根',
+  desc:'白いパネルと横長のガラス帯、グレーの縦の付け柱でまとめた外観。3階ホームのある西側(幅約18 m)が一段高い箱で、東口から見ると手前の2階建ての箱の奥に3階の箱が重なる2段構成。屋根の輪郭は国土地理院の建物データ(無壁舎)に合わせた。ホームと線路は南北の妻面からそのまま外へ抜ける。',
+  specs:[['駅舎の大きさ','長さ 約131 m・幅 約33 m(基盤地図情報)'],['3階の箱','長さ 約112 m・幅 約18 m'],['東口の看板','MEITETSU 太田川駅']]});
+{
+  const k = 'shell';
+  const mPanel = M(k, 0xf2f3f3, {roughness:.55, side:THREE.DoubleSide}), mPil = M(k, 0x8e98a2, {roughness:.5, metalness:.15}), mRoof = M(k, 0x6e655e, {roughness:.85, side:THREE.DoubleSide}), mRoofE = M(k, 0x8a837c, {roughness:.85, side:THREE.DoubleSide}), mDoor = M(k, 0x38485a, {roughness:.1, metalness:.5}), mPlant = M(k, 0xb7bdc2, {roughness:.6});
+  const LE = ZE1 - ZE0, LW = ZW1 - ZW0, cE = (ZE0+ZE1)/2, cW = (ZW0+ZW1)/2;
+  const s1 = piece(k, EX.conc), s2 = piece(k, EX.f2), sE = piece(k, EX.mezz + 6), s3 = piece(k, EX.f3), sR = piece(k, EX.f3 + 8);
+  // 1F walls with exits: 東出口(南改札)/西口 on the free passage (z 21–34), 北出口 at the north end
+  [XE, XW].forEach(x => {
+    const segs = x > 0 ? [[ZE0,-50],[-43,21],[34,ZE1]] : [[ZE0,21],[34,ZE1]];
+    segs.forEach(([a,b]) => box(k, mPanel, x-0.25, x+0.25, 0, D2B, a, b, {parent:s1, edges:true}));
+    box(k, mDoor, x-0.1, x+0.1, 0.3, 3.4, 21, 34, {parent:s1});
+    box(k, mPanel, x-0.25, x+0.25, 3.4, D2B, 21, 34, {parent:s1});
+  });
+  box(k, mDoor, XE-0.1, XE+0.1, 0.3, 3.2, -50, -43, {parent:s1}); box(k, mPanel, XE-0.25, XE+0.25, 3.2, D2B, -50, -43, {parent:s1});
+  box(k, mPanel, XW, -6, 0, D2B, ZE0-0.25, ZE0+0.25, {parent:s1, edges:true}); box(k, mPanel, 8, XE, 0, D2B, ZE0-0.25, ZE0+0.25, {parent:s1, edges:true});
+  box(k, mDoor, -6, 8, 0.3, 3.2, ZE0-0.1, ZE0+0.1, {parent:s1}); box(k, mPanel, -6, 8, 3.2, D2B, ZE0-0.25, ZE0+0.25, {parent:s1});
+  box(k, mPanel, XW, XE, 0, D2B, ZE1-0.25, ZE1+0.25, {parent:s1, edges:true});
+  // east exit: entrance canopy and the station name board
+  box(k, M(k, 0xe9ecee, {roughness:.5}), XE, XE+4.2, 3.9, 4.2, 19.5, 35.5, {parent:s1, edges:true});
+  const nameTex = canvasTex(1024, 160, (c,w,h) => { c.fillStyle = '#ffffff'; c.fillRect(0,0,w,h);
+    c.fillStyle = '#1d3f7a'; c.fillRect(24, 26, 100, 108); c.fillStyle = '#fff'; c.fillRect(46, 50, 56, 44); c.fillStyle = '#1d3f7a'; c.fillRect(54, 58, 40, 20);
+    const g = c.createLinearGradient(150,0,420,0); g.addColorStop(0,'#e0313a'); g.addColorStop(1,'#2f74c0'); c.fillStyle = g; c.fillRect(150, 34, 270, 10);
+    c.fillStyle = '#1d3f7a'; c.font = 'italic bold 38px "IBM Plex Mono", monospace'; c.textBaseline = 'middle'; c.fillText('MEITETSU', 152, 96);
+    c.fillStyle = '#1b2227'; c.font = 'bold 96px "BIZ UDPGothic", sans-serif'; c.fillText('太田川駅', 440, 86);
+    c.font = '500 20px "IBM Plex Mono", monospace'; c.fillStyle = '#5b6872'; c.fillText('ŌTAGAWA STATION', 840, 132); c.fillStyle = '#2f74c0'; c.fillRect(0,h-8,w,8); });
+  const sign = box(k, M(k, 0xffffff, {map:nameTex, roughness:.4}), XE+0.25, XE+0.45, 4.6, 5.9, 22.5, 32.5, {parent:s1});
+  sign.geometry = new THREE.PlaneGeometry(9.5, 1.5); sign.position.set(XE+0.32, 5.2, 27.5); sign.rotation.y = Math.PI/2;
+  // 2F band: spandrel, glass ribbon, top band (both long sides)
+  [[XE, ZE0, ZE1], [XW, ZE0, ZE1]].forEach(([x, z0, z1]) => {
+    box(k, mPanel, x-0.3, x+0.3, D2B, P2+0.9, z0, z1, {parent:s2, edges:true});
+    plane(k, glassMat(k, z1-z0), z1-z0, 4.6, new V3(x, P2+0.9+2.3, (z0+z1)/2), x > 0 ? Math.PI/2 : -Math.PI/2, s2);
+    box(k, mPanel, x-0.3, x+0.3, P2+5.5, D3B+0.2, z0, z1, {parent:s2, edges:true});
+  });
+  // east block: parapet band and roof over 1・2番線, the mains and the mezzanine; a skylight strip and rooftop plant
+  box(k, mPanel, XE-0.3, XE+0.3, D3B+0.2, ROOF_E, ZE0, ZE1, {parent:sE, edges:true});
+  box(k, mRoofE, XM-0.2, XE+0.4, ROOF_E, ROOF_E+0.7, ZE0-0.4, ZE1+0.4, {parent:sE, edges:true});
+  [ZE0, ZE1].forEach(z => box(k, mPanel, XM-0.2, XE+0.3, R2+5.8, ROOF_E, z-0.25, z+0.25, {parent:sE, edges:true}));
+  box(k, M(k, 0xa9c6d6, {transparent:true, opacity:.6, roughness:.1, metalness:.4}), 4.2, 12.4, ROOF_E+0.7, ROOF_E+1.2, -2, 41, {parent:sE});
+  [[8,-30],[8,52]].forEach(([x,z]) => box(k, mPlant, x-2, x+2, ROOF_E+0.7, ROOF_E+2.0, z-3, z+3, {parent:sE, edges:true}));
+  // west (3F) block
+  box(k, mPanel, XW-0.3, XW+0.3, D3B+0.2, P3+0.8, ZW0, ZW1, {parent:s3, edges:true});
+  plane(k, glassMat(k, LW), LW, 4.8, new V3(XW, P3+0.8+2.4, cW), -Math.PI/2, s3);
+  box(k, mPanel, XW-0.3, XW+0.3, P3+5.6, ROOF_W, ZW0, ZW1, {parent:s3, edges:true});
+  box(k, mPanel, XM-0.3, XM+0.3, ROOF_E, P3+0.8, ZW0, ZW1, {parent:s3, edges:true});
+  plane(k, glassMat(k, LW), LW, 4.8, new V3(XM, P3+0.8+2.4, cW), Math.PI/2, s3);
+  box(k, mPanel, XM-0.3, XM+0.3, P3+5.6, ROOF_W, ZW0, ZW1, {parent:s3, edges:true});
+  [ZW0, ZW1].forEach(z => box(k, mPanel, XW, XM, R3+5.8, ROOF_W, z-0.25, z+0.25, {parent:s3, edges:true}));
+  // the 2F part under the 3F block also gets end fascias
+  [ZE0, ZE1].forEach(z => box(k, mPanel, XW, XM, R2+5.8, D3B+0.2, z-0.25, z+0.25, {parent:s2, edges:true}));
+  box(k, mRoof, XW-0.4, XM+0.3, ROOF_W, ROOF_W+0.7, ZW0-0.4, ZW1+0.4, {parent:sR, edges:true});
+  [[-12,-24],[-6,30]].forEach(([x,z]) => box(k, mPlant, x-2.5, x+2.5, ROOF_W+0.7, ROOF_W+2.0, z-4, z+4, {parent:sR, edges:true}));
+  // grey pilasters dividing the facades into bays (east face: as in the photos)
+  [ZE0+1.1, -32, -9, 16, 38, 58, ZE1-1.1].forEach(z => {
+    box(k, mPil, XE, XE+0.7, 0, ROOF_E + 0.6, z-1.1, z+1.1, {parent:s2, edges:true});
+    box(k, mPil, XW-0.7, XW, 0, z > ZW0 && z < ZW1 ? ROOF_W + 0.6 : ROOF_E + 0.6, z-1.1, z+1.1, {parent: z > ZW0 && z < ZW1 ? s3 : s2, edges:true});
+  });
+  [ZW0+1.1, -20, 10, 40, ZW1-1.1].forEach(z => box(k, mPil, XM-0.2, XM+0.6, ROOF_E, ROOF_W + 0.6, z-1.1, z+1.1, {parent:s3, edges:true}));
+}
+
+/* ====================================================================================== */
+/*  VERTICAL CIRCULATION                                                                   */
+/* ====================================================================================== */
+part('vertical', {dot:'#3c4650', lv:'1F–3F', name:'エスカレーター・階段・エレベーター',
+  desc:'すべてのホームに車椅子対応のエレベーターとエスカレーターがある。2階の3・4番線と3階の5・6番線は直通のエスカレーターで結ばれ、同じ名古屋方面の列車へすぐ乗り換えられる。中3階へはエレベーターと階段で上がる。配置は推定。',
+  specs:[['直通エスカレーター','3・4番線 ⇄ 5・6番線'],['中3階','エレベーター・階段のみ']]});
+const escShape = new THREE.Shape([[0,-0.06],[0.1,-0.06],[0.9,0.94],[1,0.94],[1,1],[0.9,1],[0.1,0],[0,0]].map(([u,v]) => new THREE.Vector2(u,v)));
+const sideShape = new THREE.Shape([[0,0],[0.1,0],[0.9,1],[1,1],[1,1.11],[0.9,1.11],[0.1,0.11],[0,0.11]].map(([u,v]) => new THREE.Vector2(u,v)));
+function slope(kind, xc, w, z0, z1, botLayer, botY, topLayer, topY){
+  const k = 'vertical', grp = new THREE.Group();
+  const g = new THREE.ExtrudeGeometry(escShape, {depth:w, bevelEnabled:false}); g.rotateY(-Math.PI/2);
+  const T = parts[k]._m || (parts[k]._m = {esc:M(k, 0x59656f, {metalness:.35, roughness:.45}), st:M(k, 0xd6d9dc, {roughness:.7}), glass:M(k, 0xbcd6e2, {transparent:true, opacity:.3, roughness:.1, side:THREE.DoubleSide, depthWrite:false})});
+  const m = new THREE.Mesh(g, kind === 'esc' ? T.esc : T.st); grp.add(m);
+  if (kind === 'esc'){ const sg = new THREE.ShapeGeometry(sideShape); sg.rotateY(-Math.PI/2); [0, -w].forEach(dx => { const s = new THREE.Mesh(sg, T.glass); s.position.x = dx; grp.add(s); }); }
+  grp.position.set(xc + w/2, 0, z0); grp.scale.z = z1 - z0;
+  parts[k].group.add(grp); connect(grp, botLayer, botY, topLayer, topY); return grp;
+}
+const lifts = [];
+function lift(xc, zc, botLayer, botY, topLayer, topY){
+  const k = 'vertical';
+  const T = parts[k]._l || (parts[k]._l = {glass:M(k, 0x8fc0d8, {transparent:true, opacity:.3, roughness:.08, metalness:.3, side:THREE.DoubleSide, depthWrite:false}), car:M(k, 0xc23039, {roughness:.5})});
+  const shaft = new THREE.Mesh(new THREE.BoxGeometry(1,1,1).translate(0,0.5,0), T.glass);
+  shaft.position.set(xc, 0, zc); shaft.scale.set(2.4, 1, 2.4);
+  shaft.add(new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(1,1,1).translate(0,0.5,0)), edgeMat(k)));
+  parts[k].group.add(shaft); connect(shaft, botLayer, botY, topLayer, topY);
+  const car = new THREE.Mesh(new THREE.BoxGeometry(1.8, 2.3, 1.8), T.car); car.position.set(xc, 0, zc); parts[k].group.add(car);
+  lifts.push({car, shaft, phase:(lifts.length*2.7)%10});
+}
+{
+  const F1 = 0.3, XA = 8.5, XB = -8.0;     // island 1・2 / island 3・4 centre lines
+  [[XA, 1], [XB, -1]].forEach(([xc, s]) => {
+    slope('esc', xc + s*1.1, 1.3, -38, -22, 'conc', F1, 'f2', P2);
+    slope('st',  xc - s*1.5, 2.2, -38, -22, 'conc', F1, 'f2', P2);
+    slope('esc', xc + s*1.1, 1.3, 2, 18, 'conc', F1, 'f2', P2);
+    slope('st',  xc - s*1.5, 2.2, 2, 18, 'conc', F1, 'f2', P2);
+    lift(xc, -12, 'conc', F1, 'f2', P2);
+  });
+  slope('esc', XB + 1.3, 1.3, -40, -59, 'f2', P2, 'f3', P3);         // 3・4番線 ⇄ 5・6番線 direct
+  slope('st', XA - 0.6, 2.0, 45, 35, 'f2', P2, 'mezz', MZ);
+  slope('st', XB + 0.9, 2.0, 45, 35, 'f2', P2, 'mezz', MZ);
+  lift(XA + 1.9, 31, 'f2', P2, 'mezz', MZ + 2.4);
+  lift(XB - 1.9, 31, 'f2', P2, 'f3', P3);
+  slope('st', XB - 0.4, 1.8, 34.5, 44.5, 'mezz', MZ, 'f3', P3);
+}
+
+/* ====================================================================================== */
+/*  TRAINS                                                                                 */
+/* ====================================================================================== */
+part('trains', {dot:'#c23039', lv:'列車', name:'列車(イメージ)',
+  desc:'3階の6番線に河和線からの上り列車、2階の3番線に常滑線の上り列車、1番線に河和線へ向かう下り列車が発着する。2番線(下り本線)をミュースカイが通過する。車両の形と塗装はイメージ。',
+  specs:[['表示','1番線 下り/3番線・6番線 上り/2番線 通過列車']]});
+const carShape = (() => { const s = new THREE.Shape(), w = 1.37, h = 3.55, r = 0.55; s.moveTo(-w, 0); s.lineTo(w, 0); s.lineTo(w, h-r); s.quadraticCurveTo(w, h, w-r, h); s.lineTo(-w+r, h); s.quadraticCurveTo(-w, h, -w, h-r); s.lineTo(-w, 0); return s; })();
+const CAR_L = 18.5, PITCH = 19.4;
+const carBodyG = new THREE.ExtrudeGeometry(carShape, {depth:CAR_L, bevelEnabled:false}).translate(0, 1.05, -CAR_L/2);
+function sideTex(type){
+  return canvasTex(1024, 160, (c,w,h) => {
+    c.fillStyle = {red:'#b81f2c', sus:'#c9cdd1', ms:'#f3f5f7'}[type]; c.fillRect(0,0,w,h);
+    if (type === 'sus'){ c.fillStyle = '#c8102e'; c.fillRect(0, h*0.72, w, 10); }
+    if (type === 'ms'){ c.fillStyle = '#1f4f9e'; c.fillRect(0, h*0.66, w, h*0.34); }
+    const doors = type === 'ms' ? [0.12, 0.88] : [0.2, 0.5, 0.8];
+    c.fillStyle = '#2a3440';
+    for (let x = 30; x < w-30; x += 70){ if (doors.some(d => Math.abs(x/w - d) < 0.07)) continue; c.fillRect(x, h*0.18, 54, h*0.36); }
+    doors.forEach(d => { const x = d*w; c.fillStyle = type === 'ms' ? '#d9dee3' : '#8e969d'; c.fillRect(x-30, h*0.1, 60, h*0.88); c.fillStyle = '#2a3440'; c.fillRect(x-22, h*0.18, 18, h*0.3); c.fillRect(x+4, h*0.18, 18, h*0.3); });
+  });
+}
+const trainTypes = {};
+function trainMats(type){
+  if (trainTypes[type]) return trainTypes[type];
+  const k = 'trains', body = {red:0xb81f2c, sus:0xc9cdd1, ms:0xf3f5f7}[type];
+  return trainTypes[type] = {
+    body:M(k, body, {roughness: type === 'sus' ? .32 : .45, metalness: type === 'sus' ? .55 : .1}),
+    side:M(k, 0xffffff, {map:sideTex(type), roughness:.35, metalness: type === 'sus' ? .4 : .05}),
+    dark:M(k, 0x2c3238, {roughness:.6}), roof:M(k, 0x8a9096, {roughness:.6}), glass:M(k, 0x1d2730, {roughness:.1, metalness:.5})};
+}
+function makeCar(type, front){
+  const T = trainMats(type), g = new THREE.Group();
+  g.add(new THREE.Mesh(carBodyG, T.body));
+  [1,-1].forEach(s => { const p = new THREE.Mesh(new THREE.PlaneGeometry(CAR_L-0.4, 2.2), T.side); p.position.set(s*1.375, 2.55, 0); p.rotation.y = s*Math.PI/2; g.add(p); });
+  const under = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.75, CAR_L-5), T.dark); under.position.y = 0.6; g.add(under);
+  [-6.6, 6.6].forEach(z => { const bg = new THREE.Mesh(new THREE.BoxGeometry(2.3, 0.7, 2.6), T.dark); bg.position.set(0, 0.45, z); g.add(bg); });
+  const rf = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.25, CAR_L-1.5), T.roof); rf.position.y = 4.7; g.add(rf);
+  if (front) [1,-1].forEach(s => { const f = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 1.1), T.glass); f.position.set(0, 3.0, s*(CAR_L/2+0.01)); if (s < 0) f.rotation.y = Math.PI; g.add(f); });
+  g.traverse(o => { if (o.isMesh){ o.castShadow = true; o.receiveShadow = true; } });
+  return g;
+}
+/* a train runs along a chain of paths (joined end to end) */
+function chainCurve(keys){
+  const pts = []; keys.forEach(k => PATH[k].smp.forEach((p, i) => { if (i % 2 === 0 && (!pts.length || pts[pts.length-1].distanceTo(new V3(p.x,p.y,p.z)) > 0.5)) pts.push(new V3(p.x, p.y, p.z)); }));
+  return new THREE.CatmullRomCurve3(pts, false, 'centripetal', 0.5);
+}
+const trains = [];
+function makeTrain(keys, layer, type, n, plan){
+  const g = new THREE.Group(); g.userData.part = 'trains';
+  const cars = []; for (let i=0;i<n;i++){ const c = makeCar(type, i === 0 || i === n-1); g.add(c); cars.push(c); }
+  parts[layer].group.add(g);
+  const cv = chainCurve(keys), L = cv.getLength();
+  let sStop = 0, bd = 1e9; for (let i=0;i<=1200;i++){ const p = cv.getPointAt(i/1200); if (Math.abs(p.z) < bd && Math.abs(p.x) < 20){ bd = Math.abs(p.z); sStop = i/1200*L; } }
+  trains.push(Object.assign({g, cars, cv, L, sStop, n}, plan));
+}
+makeTrain(['t5'], 'f3', 'red', 6, {dir:-1, offset:0,  kind:'stop', via:'t6'});
+makeTrain(['up'], 'f2', 'sus', 6, {dir:-1, offset:17, kind:'stop'});
+makeTrain(['t1'], 'f2', 'sus', 4, {dir:+1, offset:31, kind:'stop'});
+makeTrain(['dn'], 'f2', 'ms',  4, {dir:+1, offset:9,  kind:'pass'});
+/* the 6番線 train: ramp (t5 south of the junction) → t6 through the platform → t5 north of it */
+{
+  const tr = trains[0], s5 = PATH.t5.smp, s6 = PATH.t6.smp;
+  const north = s5.filter(p => p.z < s6[0].z), south = s5.filter(p => p.z > s6[s6.length-1].z);
+  const pts = north.concat(s6, south).filter((_, i) => i % 2 === 0).map(p => new V3(p.x, p.y, p.z));
+  tr.cv = new THREE.CatmullRomCurve3(pts, false, 'centripetal', 0.5); tr.L = tr.cv.getLength();
+  let bd = 1e9; for (let i=0;i<=1200;i++){ const p = tr.cv.getPointAt(i/1200); if (Math.abs(p.z) < bd){ bd = Math.abs(p.z); tr.sStop = i/1200*tr.L; } }
+}
+const CYCLE = 48;
+/* arc length of the leading end at time t (null = off stage) */
+function trainHead(tr, t){
+  const T = ((t + tr.offset) % CYCLE + CYCLE) % CYCLE, half = (tr.n * PITCH) / 2;
+  if (tr.kind === 'pass'){ if (T > 22) return null; return tr.sStop + tr.dir * (-520 + T*33 + half); }
+  let g;
+  if (T < 13){ const u = T/13; g = -300 * Math.pow(1-u, 2); }
+  else if (T < 25) g = 0;
+  else if (T < 41){ const u = (T-25)/16; g = 360 * u*u; }
+  else return null;
+  return tr.sStop + tr.dir * (g + half);   // stopped trains are centred on the platform
+}
+const tmpP = new V3(), tmpT = new V3();
+function placeTrain(tr, head){
+  tr.g.visible = head !== null && state.trains;
+  if (head === null) return;
+  tr.cars.forEach((c, i) => {
+    const u = (head - tr.dir * (i + 0.5) * PITCH) / tr.L;
+    if (u < 0.003 || u > 0.997){ c.visible = false; return; }
+    tr.cv.getPointAt(u, tmpP);
+    c.visible = Math.abs(tmpP.x) < EXT - 20 && Math.abs(tmpP.z) < EXT - 20;
+    tr.cv.getTangentAt(u, tmpT);
+    const oy = tr.g.parent.position.y;
+    c.position.copy(tmpP); c.lookAt(tmpP.x + tmpT.x, tmpP.y + tmpT.y + oy, tmpP.z + tmpT.z);
+  });
+}
+
+/* ---------- shadows ---------- */
+scene.traverse(o => { if (o.isMesh && o.material && !o.material.transparent && !o.userData.noPick){ o.castShadow = true; o.receiveShadow = true; } });
+
+/* ====================================================================================== */
+/*  STATE / UI                                                                             */
+/* ====================================================================================== */
+const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+const state = {cutZ:31, mode:'bldg', explode:0, exTarget:0, trains:true, labels:true, tracks:true, shell:true, city:true, photo:Q.get('photo') !== '0', hover:null, selected:null, animTrains:!reduce};
+const CUT_MIN = ZE0, CUT_MAX = PZ1 + 3;
+const cutFromPct = p => CUT_MIN + (CUT_MAX - CUT_MIN) * p/100;
+const pctFromCut = z => Math.round((z - CUT_MIN) / (CUT_MAX - CUT_MIN) * 100);
+function setCut(z){ state.cutZ = z; cutA.constant = z; }
+function setMode(m){ state.mode = m; cutB.constant = m === 'bldg' ? -(PZ1 + 3) : -1e5;
+  parts.city.mats.concat(parts.city.lines).forEach(mt => { mt.clippingPlanes = m === 'all' ? clip : null; mt.clipIntersection = true; mt.clipShadows = m === 'all'; mt.needsUpdate = true; });
+  parts.city.slab.visible = m === 'all'; $('modeBldg').setAttribute('aria-pressed', m === 'bldg'); $('modeAll').setAttribute('aria-pressed', m === 'all'); }
+const inRemoved = p => p.z > state.cutZ + 1e-3 && (state.mode === 'all' || p.z < PZ1 + 3);
+
+function applyLook(){
+  order.forEach(k => {
+    const ghost = state.selected && state.selected !== k && k !== 'city';
+    const em = state.selected === k ? 0x3a0e10 : state.hover === k ? 0x16212a : 0x000000;
+    parts[k].mats.forEach(m => {
+      m.emissive.setHex(em);
+      const isGlass = m.userData.glass !== undefined, wantT = ghost || isGlass;
+      if (m.transparent !== wantT){ m.transparent = wantT; m.needsUpdate = true; }
+      m.opacity = ghost ? 0.07 : (isGlass ? m.userData.glass : 1);
+      m.depthWrite = !wantT;
+    });
+    parts[k].lines.forEach(l => l.opacity = ghost ? 0.02 : 0.16);
+  });
+  parts.city.group.visible = state.city;
+  parts.shell.group.visible = state.shell;
+  cityBits.photo.forEach(o => o.visible = state.photo);
+  cityBits.plain.forEach(o => o.visible = !state.photo);
+  document.querySelectorAll('#partlist button').forEach(b => {
+    b.setAttribute('aria-pressed', b.dataset.k === state.selected ? 'true' : 'false');
+    b.classList.toggle('hov', b.dataset.k === state.hover);
+  });
+}
+
+const ui = {cut:$('cut'), explode:$('explode')};
+function syncUI(){
+  const z = state.cutZ;
+  $('cutOut').textContent = z >= CUT_MAX - 0.5 ? 'カットなし' : `駅舎の南端から 約${Math.max(0, Math.round(ZE1 - z))} m`;
+  $('exOut').textContent = Math.round(state.exTarget*100) + '%';
+}
+ui.cut.addEventListener('input', e => { setCut(cutFromPct(+e.target.value)); syncUI(); });
+ui.explode.addEventListener('input', e => { state.exTarget = e.target.value/100; syncUI(); });
+$('modeBldg').onclick = () => setMode('bldg');
+$('modeAll').onclick = () => setMode('all');
+$('photo').checked = state.photo;
+[['trains','trains'],['shell','shell'],['city','city'],['photo','photo'],['lbl','labels'],['trk','tracks']].forEach(([id, key]) => $(id).addEventListener('change', e => { state[key] = e.target.checked; applyLook(); }));
+function toggleExplode(){ state.exTarget = state.exTarget > 0.5 ? 0 : 1; ui.explode.value = state.exTarget*100; syncUI(); }
+
+const list = $('partlist');
+['shell','f3','mezz','f2','vertical','conc','structure','trains','city'].forEach(k => {
+  const p = parts[k], li = document.createElement('li'), b = document.createElement('button');
+  b.dataset.k = k; b.setAttribute('aria-pressed','false');
+  b.innerHTML = `<span class="dot" style="background:${p.dot}"></span><span>${p.name}</span><span class="lv">${p.lv}</span>`;
+  b.onclick = () => select(state.selected === k ? null : k);
+  b.onmouseenter = () => { state.hover = k; applyLook(); };
+  b.onmouseleave = () => { state.hover = null; applyLook(); };
+  li.appendChild(b); list.appendChild(li);
+});
+function select(k){
+  state.selected = k; applyLook();
+  const card = $('card');
+  if (!k){ card.hidden = true; return; }
+  const p = parts[k];
+  $('cLv').textContent = p.lv; $('cName').textContent = p.name; $('cDesc').textContent = p.desc;
+  $('cSpecs').innerHTML = p.specs.map(([a,b]) => `<dt>${a}</dt><dd>${b}</dd>`).join('');
+  card.hidden = false;
+}
+$('cardClose').onclick = () => select(null);
+
+/* labels */
+const labelsEl = $('labels');
+const LABELS = [
+  {t:'1F コンコース', c:'var(--f1)', layer:'conc', p:[XW-1, 3.5, ZW1], atCut:true},
+  {t:'2F 1〜4番線', c:'var(--f2)', layer:'f2', p:[XW-1, P2+1.5, ZW1], atCut:true},
+  {t:'中3F 連絡通路', c:'var(--fm)', layer:'mezz', p:[-11, MZ+2.0, 31]},
+  {t:'3F 5・6番線', c:'var(--f3)', layer:'f3', p:[XW-1, P3+3, ZW1], atCut:true},
+  {t:'名古屋・金山方面', layer:'f2', p:[1.5, R2+7, -470], cls:'dir'},
+  {t:'常滑・中部国際空港方面', layer:'f2', p:[0, R2+7, 470], cls:'dir'},
+  {t:'河和・内海方面', layer:'f2', p:[150, 14, 470], cls:'dir'},
+  {t:'留置線', layer:'f2', p:[8.5, R2+3, 420], cls:'dir'},
+  {t:'東口 バスのりば', layer:'city', p:[42, 7, 82], cls:'lm'},
+  {t:'噴水', layer:'city', p:[78, 4, 35], cls:'lm'},
+  {t:'どんでん広場(50 m歩道)', layer:'city', p:[226, 3, 33], cls:'lm'},
+  {t:'ユウナル東海(東海市芸術劇場)', layer:'city', p:[-70, 31, 55], cls:'lm'},
+  {t:'ローレルタワー太田川駅前(16階・約57 m)', layer:'city', p:[-82, 66, 108], cls:'lm'},
+  {t:'ラスパ太田川', layer:'city', p:[-67, 16, -20], cls:'lm'},
+  {t:'西口 大屋根', layer:'city', p:[-48, 11, 25], cls:'lm'},
+  {t:'東出口(南改札)', layer:'city', p:[XE+3, 5, 27.5], cls:'lm'},
+  {t:'北出口', layer:'city', p:[1, 5, ZE0-5], cls:'lm'},
+  {t:'西口', layer:'city', p:[XW-7, 1.5, 27.5], cls:'lm'},
+];
+// track numbers, floating over each track at the south end of the platforms
+[['1','t1','f2',R2],['2','dn','f2',R2],['3','up','f2',R2],['4','t4','f2',R2],['5','t5','f3',R3],['6','t6','f3',R3]].forEach(([n, key, layer, y]) => {
+  const r = xAt(key, -70); LABELS.push({t:n, layer, p:[r.x, y + 1.2, -70], cls:'trk', trk:true});
+});
+LABELS.forEach(l => { const d = document.createElement('div'); d.className = 'flabel' + (l.cls ? ' ' + l.cls : ''); d.innerHTML = (l.c ? `<i style="background:${l.c}"></i>` : '') + l.t; labelsEl.appendChild(d); l.el = d; });
+const layerOff = k => (EX[k] || 0) * state.explode;
+const tmpV = new V3();
+function placeLabels(){
+  labelsEl.hidden = !state.labels;
+  if (!state.labels) return;
+  const w = stage.clientWidth, h = stage.clientHeight, dist = camera.position.distanceTo(controls.target);
+  LABELS.forEach(l => {
+    tmpV.set(l.p[0], l.p[1] + layerOff(l.layer), l.atCut ? Math.min(state.cutZ, l.p[2]) - 2 : l.p[2]);
+    const hidden = (l.cls === 'lm' && (!state.city || state.explode > 0.05)) || (!l.cls && state.selected && state.selected !== l.layer)
+      || (l.trk && (!state.tracks || dist > 330 || (state.selected && state.selected !== l.layer)));
+    const far = camera.position.distanceTo(tmpV);
+    tmpV.project(camera);
+    const off = hidden || tmpV.z > 1 || Math.abs(tmpV.x) > 1.05 || Math.abs(tmpV.y) > 1.05 || (l.cls === 'lm' && far > 760);
+    l.el.style.display = off ? 'none' : 'flex';
+    if (!off) l.el.style.transform = `translate(${(tmpV.x*0.5+0.5)*w}px, ${(-tmpV.y*0.5+0.5)*h}px) translate(${l.cls && l.cls !== 'trk' ? '-50%' : l.trk ? '-50%' : '-100%'}, -50%)`;
+  });
+}
+
+/* views */
+const VIEWS = {
+  cover:   {az:0.66, el:0.44, r:165, t:[-2, 14, 16], cut:31,      ex:0, shell:true},
+  explode: {az:0.62, el:0.30, r:250, t:[0, 34, 0],   cut:31,      ex:1, shell:false},
+  east:    {az:1.30, el:0.15, r:150, t:[10, 11, 20], cut:CUT_MAX, ex:0, shell:true},
+};
+let fly = null;
+const ss = t => t*t*(3-2*t);
+function camFor(v){ const t = new V3(...v.t); return {p:sph(v.az, v.el, v.r, t), t}; }
+function goView(name, instant){
+  const v = VIEWS[name], c = camFor(v);
+  setCut(v.cut); ui.cut.value = pctFromCut(v.cut);
+  state.exTarget = v.ex; ui.explode.value = v.ex*100; syncUI();
+  state.shell = v.shell; $('shell').checked = v.shell; applyLook();
+  if (instant){ camera.position.copy(c.p); controls.target.copy(c.t); state.explode = v.ex; }
+  else fly = {t:0, dur:1.4, p0:camera.position.clone(), t0:controls.target.clone(), p1:c.p, t1:c.t};
+}
+$('vCover').onclick = () => { stopTour(); goView('cover'); };
+$('vExplode').onclick = () => { stopTour(); goView('explode'); };
+$('vEast').onclick = () => { stopTour(); goView('east'); };
+
+/* picking */
+const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+let needPick = false, mouse = {x:0,y:0}, downAt = null;
+const tip = $('tip'), cv = renderer.domElement;
+const setNdc = e => { const r = cv.getBoundingClientRect(); ndc.set((e.clientX-r.left)/r.width*2-1, -(e.clientY-r.top)/r.height*2+1); };
+cv.addEventListener('pointermove', e => { setNdc(e); mouse = {x:e.clientX, y:e.clientY}; needPick = e.pointerType === 'mouse'; });
+cv.addEventListener('pointerleave', () => { if (state.hover){ state.hover = null; applyLook(); } tip.hidden = true; });
+cv.addEventListener('pointerdown', e => { downAt = {x:e.clientX, y:e.clientY}; if (tour) stopTour(); fly = null; });
+cv.addEventListener('pointerup', e => { if (!downAt || Math.hypot(e.clientX-downAt.x, e.clientY-downAt.y) > 5) return; setNdc(e); select(pick()); });
+function pick(){
+  ray.setFromCamera(ndc, camera);
+  const hits = ray.intersectObjects(order.filter(k => parts[k].group.visible).map(k => parts[k].group), true);
+  for (const h of hits){
+    if (!h.object.isMesh || h.object.userData.noPick) continue;
+    let o = h.object, vis = h.object.visible; while (o && !o.userData.part){ if (!o.visible) vis = false; o = o.parent; }
+    if (!o || !vis) continue;
+    const k = o.userData.part;
+    if (state.selected && state.selected !== k) continue;
+    if (parts[k].clipped && inRemoved(h.point)) continue;
+    return k;
+  }
+  return null;
+}
+
+/* demo tour */
+const KEYS = [
+  {t:0,  az:1.35, el:0.50, r:620, ty:6,  cut:CUT_MAX, ex:0},
+  {t:5,  az:1.05, el:0.32, r:300, ty:8,  cut:CUT_MAX, ex:0},
+  {t:10, az:0.70, el:0.34, r:210, ty:10, cut:31,  ex:0},
+  {t:15, az:0.30, el:0.22, r:130, ty:12, cut:31,  ex:0},
+  {t:21, az:0.55, el:0.30, r:250, ty:30, cut:31,  ex:1},
+  {t:27, az:1.05, el:0.26, r:250, ty:30, cut:-10, ex:1},
+  {t:33, az:0.66, el:0.36, r:215, ty:8,  cut:31,  ex:0},
+];
+let tour = null;
+function startTour(){ tour = {t:0}; select(null); fly = null; controls.enabled = false; $('tour').setAttribute('aria-pressed','true'); $('tour').textContent = '■ デモ停止'; }
+function stopTour(){ if (!tour) return; tour = null; controls.enabled = true; $('tour').setAttribute('aria-pressed','false'); $('tour').textContent = '▶ デモ再生'; }
+$('tour').onclick = () => tour ? stopTour() : startTour();
+function stepTour(dt){
+  tour.t += dt; const T = tour.t;
+  let i = 1; while (i < KEYS.length-1 && T > KEYS[i].t) i++;
+  const a = KEYS[i-1], b = KEYS[i], u = ss(Math.min(1, Math.max(0, (T-a.t)/(b.t-a.t)))), L = p => a[p] + (b[p]-a[p])*u;
+  const tgt = new V3(2, L('ty'), 10);
+  camera.position.copy(sph(L('az'), L('el'), L('r'), tgt)); controls.target.copy(tgt); camera.lookAt(tgt);
+  setCut(L('cut')); ui.cut.value = pctFromCut(state.cutZ);
+  state.exTarget = state.explode = L('ex'); ui.explode.value = Math.round(state.exTarget*100); syncUI();
+  if (T >= KEYS[KEYS.length-1].t) stopTour();
+}
+window.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' && e.key !== 'Escape') return;
+  if (e.key === 'h' || e.key === 'H'){ document.body.classList.toggle('clean'); tip.hidden = true; }
+  else if (e.key === 'e' || e.key === 'E'){ stopTour(); toggleExplode(); }
+  else if (e.key === 'Escape'){ select(null); stopTour(); }
+});
+
+/* compass: true north relative to the view (model -z is the track axis, 24.2° east of north) */
+const needle = $('needle'), north = new V3(-Math.sin(NORTH_DEG*Math.PI/180), 0, -Math.cos(NORTH_DEG*Math.PI/180)), fwd = new V3();
+function updateCompass(){
+  camera.getWorldDirection(fwd); fwd.y = 0; fwd.normalize();
+  const rx = -fwd.z, rz = fwd.x;
+  const ang = Math.atan2(north.x*rx + north.z*rz, north.x*fwd.x + north.z*fwd.z);
+  needle.setAttribute('transform', `rotate(${ang*180/Math.PI})`);
+}
+
+/* ---------- start ---------- */
+setMode('bldg');
+goView(Q.get('view') && VIEWS[Q.get('view')] ? Q.get('view') : 'cover', true);
+if (Q.get('mode') === 'all') setMode('all');
+if (Q.has('cam')){ const c = Q.get('cam').split(',').map(Number); if (c.length === 6){ camera.position.set(c[0],c[1],c[2]); controls.target.set(c[3],c[4],c[5]); } }
+if (Q.has('nocut')){ setCut(CUT_MAX); ui.cut.value = 100; }
+if (Q.has('cut')){ setCut(+Q.get('cut')); ui.cut.value = pctFromCut(state.cutZ); }
+if (Q.get('labels') === '0'){ state.labels = false; $('lbl').checked = false; }
+if (Q.get('shell') === '0'){ state.shell = false; $('shell').checked = false; }
+if (Q.has('ex')){ state.exTarget = state.explode = +Q.get('ex'); ui.explode.value = state.exTarget*100; }
+syncUI(); applyLook();
+
+const clock = new THREE.Clock(); let time = 0, trainTime = Q.has('t') ? +Q.get('t') : 0;
+const frozen = Q.has('t');
+function frame(){
+  const dt = Math.min(clock.getDelta(), 0.05); time += dt;
+  if (tour) stepTour(dt); else state.explode += (state.exTarget - state.explode) * Math.min(1, dt*4);
+  parts.structure.group.visible = state.explode < 0.12 || state.selected === 'structure';
+  order.forEach(k => { parts[k].group.position.y = parts[k].exY * state.explode; parts[k].pieces.forEach(p => p.position.y = p.userData.exY * state.explode); });
+  connectors.forEach(c => { if (c.obj.userData.fixedH){ c.obj.position.y = (c.botY + c.topY)/2 + layerOff(c.topLayer); return; } const yb = c.botY + layerOff(c.botLayer), yt = c.topY + layerOff(c.topLayer); c.obj.position.y = yb; c.obj.scale.y = Math.max(0.001, yt - yb); });
+  lifts.forEach(l => { const yb = l.shaft.position.y, h = l.shaft.scale.y, u = 0.5 - 0.5*Math.cos((frozen ? 2 : time + l.phase) * 0.35); l.car.position.y = yb + 1.2 + Math.max(0, h - 2.5) * ss(u); });
+  if (state.trains && state.animTrains && !frozen) trainTime += dt;
+  trains.forEach(tr => placeTrain(tr, trainHead(tr, trainTime)));
+
+  if (fly){ fly.t += dt; const u = ss(Math.min(1, fly.t/fly.dur)); camera.position.lerpVectors(fly.p0, fly.p1, u); controls.target.lerpVectors(fly.t0, fly.t1, u); if (u >= 1) fly = null; }
+  if (!tour) controls.update();
+  updateCompass();
+
+  if (needPick && !tour){
+    needPick = false; const k = pick();
+    if (k !== state.hover){ state.hover = k; applyLook(); }
+    if (k && !document.body.classList.contains('clean')){ tip.hidden = false; tip.textContent = parts[k].name; } else tip.hidden = true;
+    cv.style.cursor = k ? 'pointer' : 'grab';
+  }
+  if (!tip.hidden){ tip.style.left = mouse.x + 'px'; tip.style.top = mouse.y + 'px'; }
+  renderer.render(scene, camera);
+  placeLabels();
+  window.__frames = (window.__frames || 0) + 1;
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+})();
+</script>
