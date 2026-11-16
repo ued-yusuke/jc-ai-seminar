@@ -1,1 +1,6 @@
 .DS_Store
+
+# ローカル作業用(正本は design/isometric と november/assets/isometric)
+.playwright-mcp/
+/output/
+/assets/
