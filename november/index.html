@@ -137,6 +137,9 @@
   .aicard .co{font-size:14px;font-weight:800;color:var(--sub);font-family:var(--en);letter-spacing:.06em}
   .aicard.on{background:#eef1ff;box-shadow:0 0 0 2px var(--g1) inset}
   .aicard .today{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:var(--grad);color:#fff;font-size:13px;font-weight:800;padding:6px 14px;border-radius:100px;white-space:nowrap;box-shadow:0 8px 20px rgba(155,114,203,.4)}
+  .aicard .kw{font-size:14px;font-weight:900;color:var(--ink);background:#fff;border-radius:100px;padding:5px 12px;margin-top:6px;box-shadow:inset 0 0 0 1px var(--line);white-space:nowrap}
+  .aicard.on .kw{background:var(--grad);color:#fff;box-shadow:none}
+  .aicard .fd{font-size:14px;font-weight:600;color:var(--sub);line-height:1.6;text-align:center;white-space:nowrap}
   .envcard{display:flex;gap:22px;align-items:center;width:100%;background:var(--card);border-radius:18px;padding:18px 24px}
   .envcard .t{font-size:20px;font-weight:800;line-height:1.5}
   .envcard .s{font-size:15px;font-weight:600;color:var(--sub);margin-top:2px}
@@ -335,12 +338,12 @@ img[src*="assets/isometric/"]{object-fit:contain!important;background:#fff}
     <div class="eyebrow" data-anim style="--d:60"><span class="en">AI TOOLS</span>　／　代表的なAIツール</div>
     <h2 class="h-m" data-anim style="--d:160;margin-top:8px">本日は <span class="grad">Gemini</span> の使い方を実演します。</h2>
     <div class="lead" data-anim style="--d:260;font-size:20px;margin-top:10px">始めやすさと、機能の種類の多さから選びました。</div>
-    <div class="aigrid gap-m" data-anim style="--d:360">
-      <div class="aicard"><div class="logo"><img src="assets/img/logo-chatgpt.png" alt=""></div><div class="nm">ChatGPT</div><div class="co">OpenAI</div></div>
-      <div class="aicard"><div class="logo"><img src="assets/img/logo-copilot.png" alt=""></div><div class="nm">Copilot</div><div class="co">Microsoft</div></div>
-      <div class="aicard on"><span class="today">実演するツール</span><div class="logo"><img src="assets/img/logo-gemini.png" alt=""></div><div class="nm">Gemini</div><div class="co">Google</div></div>
-      <div class="aicard"><div class="logo"><img src="assets/img/logo-claude.png" alt=""></div><div class="nm">Claude</div><div class="co">Anthropic</div></div>
-      <div class="aicard"><div class="logo"><img src="assets/img/logo-grok.png" alt=""></div><div class="nm">Grok</div><div class="co">xAI</div></div>
+    <div class="aigrid gap-s" data-anim style="--d:360">
+      <div class="aicard"><div class="logo"><img src="assets/img/logo-chatgpt.png" alt=""></div><div class="nm">ChatGPT</div><div class="co">OpenAI</div><div class="kw">何でも聞ける万能型</div><div class="fd">質問にすばやく答える。<br>文章・相談・アイデア出し<br>まで幅広くこなす。</div></div>
+      <div class="aicard on"><span class="today">実演するツール</span><div class="logo"><img src="assets/img/logo-gemini.png" alt=""></div><div class="nm">Gemini</div><div class="co">Google</div><div class="kw">検索・データに強い</div><div class="fd">Google検索やGmail、<br>ドライブと連携して、<br>調べてまとめる。</div></div>
+      <div class="aicard"><div class="logo"><img src="assets/img/logo-claude.png" alt=""></div><div class="nm">Claude</div><div class="co">Anthropic</div><div class="kw">読み解き・整理が得意</div><div class="fd">長い文章や資料を<br>読み込み、要点や論点を<br>丁寧に整理する。</div></div>
+      <div class="aicard"><div class="logo"><img src="assets/img/logo-genspark.png" alt=""></div><div class="nm">Genspark</div><div class="co">MainFunc</div><div class="kw">調べて、形にする</div><div class="fd">調査からスライド・<br>資料づくりまで、<br>まとめて進める。</div></div>
+      <div class="aicard"><div class="logo"><img src="assets/img/logo-grok.png" alt=""></div><div class="nm">Grok</div><div class="co">xAI</div><div class="kw">最新の話題に強い</div><div class="fd">X（旧Twitter）の<br>投稿など、いま話題の<br>情報をもとに答える。</div></div>
     </div>
     <div class="envcard" data-anim style="--d:520;margin-top:22px">
       <span class="pill on small" style="flex:0 0 auto">本日の進め方</span>
